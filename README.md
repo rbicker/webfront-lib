@@ -1,18 +1,264 @@
 webfront-lib
 =============
 
-This library is intended to be used as git submodule for SPA projects. The goal was to write a minimalistic replacement for frontend frameworks like react or vue in typescript with no dependencies.
+This library is intended to be used as git submodule for SPA projects. The goal was to write a minimalistic replacement for frontend frameworks like react or vue in typescript with no dependencies. This README is also a reminder for myself on how I personally would like to create web projects.
 
 The library is provided "as is", feel free to for it or use it for inspiration.
 
-# Getting started
-## Visual Studio Code
-Install the following modules in vs code:
-* **lit-html**: to get syntax highlighting when writing html in javascript.
+# Visual Studio Code
+## Extensions
+Install the following extensions in vs code:
+* **lit-html / bierner.lit-html**: to get syntax highlighting when writing html in javascript
+* **ESLint / dbaeumer.vscode-eslint**: to get linting directly in js.
 
-## Start a new project
+## Settings
+add the following in the settings.json to get:
+* linting on save
+* get emmet in javascript / typescript
+
+```json
+{
+    // ...
+    "emmet.includeLanguages": {
+        "javascript": "html",
+        "typescript": "html"
+    },
+    "editor.codeActionsOnSave": {
+        "source.fixAll": true
+    },
+    // ...
+}
+```
+
+# Start a new project
+## init
 ```bash
-# init nodejs
-npm init
+# create directories & files
+mkdir -p src/components src/public/css src/public/fav src/public/img build
+touch src/public/css/style.scss
 
+# init git
+git init
+cat << EOF > .gitignore
+node_modules/
+build/
+.cache/
+EOF
+
+# add readme
+cat << EOF > README.md
+README
+======
+EOF
+
+# add changelog
+cat << EOF > CHANGELOG.md
+# Changelog
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+## [0.0.1] - $(date +"%F")
+### Added
+* project structure
+EOF
+
+# add MIT license
+cat << EOF > LICENSE
+Copyright $(date +"%Y") $(whoami)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+EOF
+
+
+# nodejs
+npm init
+npm install --save-dev typescript parcel sass
+
+# eslint
+npm install --save-dev eslint
+#npx install-peerdeps --dev eslint-config-airbnb
+npx eslint --init
+# To check syntax, find problems, and enforce code style
+# Type of modules: JavaScript modules (import/export)
+# Frameworks: None of these
+# Where does code run: Browser
+# Use Airbnb
+# Configstyle: js
+# Install dependencies
+
+# typescript
+tsc --init
+
+# add this lib
+git submodule add https://github.com/rbicker/webfront-lib src/lib
+
+# tsconfig.json
+cat << EOF > tsconfig.json
+{
+    "compilerOptions": {
+      "target": "es5",                          /* Specify ECMAScript target version: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017', 'ES2018', 'ES2019' or 'ESNEXT'. */
+      "module": "commonjs",                     /* Specify module code generation: 'none', 'commonjs', 'amd', 'system', 'umd', 'es2015', or 'ESNext'. */
+      "strict": true,                           /* Enable all strict type-checking options. */
+      "esModuleInterop": true,                  /* Enables emit interoperability between CommonJS and ES Modules via creation of namespace objects for all imports. Implies 'allowSyntheticDefaultImports'. */
+      "forceConsistentCasingInFileNames": true,  /* Disallow inconsistently-cased references to the same file. */
+      "lib": [ "dom", "es2015" ]
+    },
+    "include": [
+        "src/**/*"
+    ]
+  }
+EOF
+
+# declarations.d.ts
+cat << EOF > src/declarations.d.ts
+declare module '*.png'
+declare module '*.jpg'
+declare module '*.svg'
+EOF
+
+# index.html
+cat << EOF > src/index.html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/public/css/style.scss">
+    <title>Hello World</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script src="index.ts"></script>
+  </body>
+</html>
+EOF
+
+# store.js
+cat << EOF > src/store.ts
+import { Store } from './lib/store';
+
+const initialState = {};
+
+// save initial state, with persist set to true
+export default new Store(initialState, true);
+EOF
+
+# app.ts
+
+
+# index.ts
+cat << EOF > src/index.ts
+import './store';
+import App from './components/app';
+
+new App().render();
+EOF
+
+# Dockerfile
+cat << EOF > Dockerfile
+FROM node:alpine AS builder
+COPY . /usr/local/src/spt
+WORKDIR /usr/local/src/spt
+RUN npm install && npm run build
+
+FROM nginx
+RUN echo '\n\
+server {\n\
+    listen   80;\n\
+    root /usr/share/nginx/html;\n\
+    index index.html;\n\
+    server_name _;\n\
+    location / {\n\
+        try_files $uri /index.html;\n\
+    }\n\
+}\n\
+\n'\
+> /etc/nginx/conf.d/default.conf
+RUN rm -rf /usr/share/nginx/html/*
+COPY --from=builder /usr/local/src/spt/build/release/ /usr/share/nginx/html
+EOF
+
+```
+
+## configuration
+### package.json
+```json
+  // ...
+  // add scripts
+  "scripts": {
+    "dev": "parcel src/index.html --out-dir build/debug",
+    "build": "parcel build src/index.html --out-dir build/release --public-url ./"
+  },
+  // ...
+```
+
+### tsconfig.json
+```json
+{
+  "compilerOptions": {
+    // ...
+    "lib": [ "dom", "es2015" ]
+    // ...
+  },
+  "include": [
+      "src/**/*"
+  ]
+}
+```
+
+### .eslintrc.js
+```javascript
+module.exports = {
+  // ...
+  rules: {
+    'import/extensions': [
+      'error',
+      'ignorePackages',
+      {
+        'js': 'never',
+        'jsx': 'never',
+        'ts': 'never',
+        'tsx': 'never',
+      }
+   ],
+  },
+  settings: {
+    'import/resolver': {
+      node: {
+        paths: ['src'],
+        extensions: ['.js', '.jsx', '.ts', '.jsx']
+      }
+    },
+  },
+};
+```
+
+
+## skeleton css
+* download skeleton css from http://getskeleton.com/ and add it to public/css/ 
+* add references in index.html
+
+## css icons
+* get awesome css icons from: https://cssicon.space
+* add reference in index.html
+```bash
+curl https://cssicon.space/css/icons.css -o public/css/icons.css
+```
+
+## favicon
+* generate files using https://favicon.io/ and place them in public/fav
+* add references in index.html
+* adjusts paths (in index.html and /public/fav/site.webmanifest)
+
+# run project
+```bash
+npm run dev
 ```
