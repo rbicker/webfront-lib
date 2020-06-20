@@ -7,7 +7,6 @@ interface IStore{
   readonly state: { [key: string]: any };
 }
 
-
 class Store {
   events: { [key: string]: Function[] };
 
