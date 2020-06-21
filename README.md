@@ -3,7 +3,7 @@ webfront-lib
 
 This library is intended to be used as git submodule for SPA projects. The goal was to write a minimalistic replacement for frontend frameworks like react or vue in typescript with no dependencies. This README is also a reminder for myself on how I personally would like to create web projects.
 
-The library is provided "as is", feel free to for it or use it for inspiration.
+The library is provided "as is", feel free to fork it.
 
 # Visual Studio Code
 ## Extensions
@@ -86,13 +86,15 @@ npm install --save-dev typescript parcel sass
 npm install --save-dev eslint
 #npx install-peerdeps --dev eslint-config-airbnb
 npx eslint --init
-# To check syntax, find problems, and enforce code style
-# Type of modules: JavaScript modules (import/export)
-# Frameworks: None of these
-# Where does code run: Browser
-# Use Airbnb
-# Configstyle: js
-# Install dependencies
+How would you like to use ESLint? · style
+What type of modules does your project use? · none
+Which framework does your project use? · none
+Does your project use TypeScript? · No / Yes
+Where does your code run? · browser
+How would you like to define a style for your project? · guide
+Which style guide do you want to follow? · airbnb
+What format do you want your config file to be in? · JavaScript
+Install Dependencies
 
 # typescript
 tsc --init
@@ -185,7 +187,6 @@ server {\n\
 RUN rm -rf /usr/share/nginx/html/*
 COPY --from=builder /usr/local/src/spt/build/release/ /usr/share/nginx/html
 EOF
-
 ```
 
 ## configuration
@@ -250,7 +251,7 @@ module.exports = {
 * get awesome css icons from: https://cssicon.space
 * add reference in index.html
 ```bash
-curl https://cssicon.space/css/icons.css -o public/css/icons.css
+curl https://cssicon.space/css/icons.css -o src/public/css/icons.css
 ```
 
 ## favicon
