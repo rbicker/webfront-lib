@@ -147,27 +147,30 @@ const render = function render(element : HTMLElement | null, content :string) {
     return;
   }
   elem.innerHTML = content;
-  // find template id
-  const reComment = new RegExp(`${htmlId}-\\S+`);
+  // find template markers using html id
+  const reComment = new RegExp(`${htmlId}-\\S+`, 'g');
   const matches = content.match(reComment);
   if (!matches) {
-    logger.error(`template id not found in content: ${content}`);
+    logger.error(`html id '${htmlId}' id not found in content: ${content}`);
     return;
   }
   const reHtmlId = new RegExp(`${htmlId}-`);
-  const templateId = matches[0].replace(reHtmlId, '').trimRight();
-  // add event listeners
-  const evtObjects = eventObjects.get(templateId);
-  if (evtObjects) {
-    evtObjects.forEach((eo) => {
-      const el = document.getElementById(eo.id);
-      if (!el) {
-        logger.error(`html element with id ${eo.id} not found, unable to add event listener on ${eo.type}`);
-        return;
-      }
-      el.addEventListener(eo.type, eo);
-    });
-  }
+  // we need to loop because multiple template id's can be handled by a single render function
+  matches.forEach((match) => {
+    const templateId = match.replace(reHtmlId, '').trimRight();
+    // get event listeners
+    const evtObjects = eventObjects.get(templateId);
+    if (evtObjects) {
+      evtObjects.forEach((eo) => {
+        const el = document.getElementById(eo.id);
+        if (!el) {
+          logger.error(`html element with id ${eo.id} not found, unable to add event listener on ${eo.type}`);
+          return;
+        }
+        el.addEventListener(eo.type, eo);
+      });
+    }
+  });
 };
 
 export {
