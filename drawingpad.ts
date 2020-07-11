@@ -86,6 +86,9 @@ export default class DrawingPad {
 
   // clear the canvas and reset the drawing
   clear() {
+    if (!this.canvas) {
+      return;
+    }
     const ctx = this.canvas.getContext('2d');
     if (ctx === null) {
       logger.error('could not create 2d context for canvas');
@@ -94,5 +97,13 @@ export default class DrawingPad {
     ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.index = 1;
     this.points = [];
+  }
+
+  // touched determines if the drawing pad was used
+  touched() {
+    if (this.index > 1) {
+      return true;
+    }
+    return false;
   }
 }
