@@ -20,7 +20,7 @@ export default class Toast extends Component {
       text,
       timeout,
       totalTimeout: timeout,
-      classes,
+      // classes,
     });
     // nested timeout function
     function f() {
