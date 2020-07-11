@@ -15,9 +15,13 @@ export default class DrawingPad {
 
   points : Point[] = [];
 
-  canvas : HTMLCanvasElement;
+  canvas : HTMLCanvasElement | undefined;
 
   constructor(canvas: HTMLCanvasElement) {
+    if (!canvas) {
+      logger.error('canvas is null');
+      return;
+    }
     this.canvas = canvas;
     const ctx = canvas.getContext('2d');
     if (ctx === null) {
