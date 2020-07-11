@@ -1,5 +1,6 @@
 import Component from './component';
 import { html, render } from './html';
+import logger from './logger';
 
 export default class Toast extends Component {
   constructor() {
@@ -15,6 +16,9 @@ export default class Toast extends Component {
     classes : string|undefined,
   ) {
     const self = this;
+    if (!this.element) {
+      logger.error('cannot show toast, no element with id "toast" found');
+    }
     this.element.className = `show ${classes}`;
     this.setState({
       text,
