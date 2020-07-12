@@ -31,15 +31,52 @@ export default class DrawingPad {
     // style
     ctx.lineJoin = 'round';
     ctx.lineCap = 'round';
-    // mouse move event listener
-    canvas.addEventListener('mousemove', (e) => {
+
+    // event handler to start drawing
+    const startDrawing = (e : MouseEvent | TouchEvent) => {
+      let clientX;
+      let clientY;
+      if (e.type === 'mousedown') {
+        logger.debug('start drawing with mouse');
+        clientX = (<MouseEvent>e).clientX;
+        clientY = (<MouseEvent>e).clientX;
+      } else {
+        logger.debug('start drawing with touch');
+        // do not scroll while drawing
+        e.preventDefault();
+        clientX = (<TouchEvent>e).touches[0].clientX;
+        clientY = (<TouchEvent>e).touches[0].clientY;
+      }
+      const rect = canvas.getBoundingClientRect();
+      ctx.moveTo(clientX - rect.left, clientY - rect.top);
+      this.points.push({
+        x: clientX - rect.left,
+        y: clientY - rect.top,
+        t: new Date().getTime(),
+        l: false,
+      });
+      this.drawing = true;
+    };
+
+    // draw
+    const draw = (e : MouseEvent | TouchEvent) => {
+      let clientX;
+      let clientY;
+      if (e.type === 'mousedown') {
+        logger.debug('start drawing with mouse');
+        clientX = (<MouseEvent>e).clientX;
+        clientY = (<MouseEvent>e).clientX;
+      } else {
+        clientX = (<TouchEvent>e).touches[0].clientX;
+        clientY = (<TouchEvent>e).touches[0].clientY;
+      }
       if (!this.drawing) return;
       // clear canvas before drawing
       // ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
       const rect = canvas.getBoundingClientRect();
       this.points.push({
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top,
+        x: clientX - rect.left,
+        y: clientY - rect.top,
         t: new Date().getTime(),
         l: true,
       });
@@ -58,30 +95,27 @@ export default class DrawingPad {
           ctx.stroke();
         }
       }
-    });
-    // event handler to start drawing
-    const startDrawing = (e : MouseEvent) => {
-      logger.debug('start drawing');
-      const rect = canvas.getBoundingClientRect();
-      ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
-      this.points.push({
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top,
-        t: new Date().getTime(),
-        l: false,
-      });
-      this.drawing = true;
     };
+
     // event handler to stop drawing
     const stopDrawing = () => {
       logger.debug('stop drawing');
       this.drawing = false;
     };
-    // start painting on mouse down
+
+    // start drawing on mouse down / touch start
     canvas.addEventListener('mousedown', startDrawing, false);
-    // stop painting on mouse up / mouse leave
+    canvas.addEventListener('touchstart', startDrawing, false);
+
+    // draw on mouse move
+    canvas.addEventListener('mousemove', draw, false);
+    canvas.addEventListener('touchmove', draw, false);
+
+    // stop drawing on mouse up / mouse leave / touch end / touch cancel
     canvas.addEventListener('mouseup', stopDrawing, false);
     canvas.addEventListener('mouseleave', stopDrawing, false);
+    canvas.addEventListener('touchend', stopDrawing, false);
+    canvas.addEventListener('touchcancel', stopDrawing, false);
   }
 
   // clear the canvas and reset the drawing
