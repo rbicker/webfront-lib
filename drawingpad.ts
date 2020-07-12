@@ -62,8 +62,7 @@ export default class DrawingPad {
     const draw = (e : MouseEvent | TouchEvent) => {
       let clientX;
       let clientY;
-      if (e.type === 'mousedown') {
-        logger.debug('start drawing with mouse');
+      if (e.type === 'mousemove') {
         clientX = (<MouseEvent>e).clientX;
         clientY = (<MouseEvent>e).clientX;
       } else {
