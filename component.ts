@@ -30,7 +30,9 @@ export default class Component {
         return;
       }
       params.renderTriggers.forEach((trigger) => {
-        (<IStore> this.store).subscribe(trigger, () => this.render());
+        // use event queue to trigger render to avoid race conditions
+        // between javascript and browser rendering
+        (<IStore> this.store).subscribe(trigger, () => setTimeout(() => { this.render(); }, 0));
       });
     }
   }
@@ -38,7 +40,7 @@ export default class Component {
   // change the component's state
   setState = (newState: object) => {
     this.state = { ...this.state, ...newState };
-    this.render();
+    setTimeout(() => { this.render(); }, 0);
   };
 
   // render the inner html
