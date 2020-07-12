@@ -39,7 +39,7 @@ export default class DrawingPad {
       if (e.type === 'mousedown') {
         logger.debug('start drawing with mouse');
         clientX = (<MouseEvent>e).clientX;
-        clientY = (<MouseEvent>e).clientX;
+        clientY = (<MouseEvent>e).clientY;
       } else {
         logger.debug('start drawing with touch');
         // do not scroll while drawing
@@ -64,7 +64,7 @@ export default class DrawingPad {
       let clientY;
       if (e.type === 'mousemove') {
         clientX = (<MouseEvent>e).clientX;
-        clientY = (<MouseEvent>e).clientX;
+        clientY = (<MouseEvent>e).clientY;
       } else {
         clientX = (<TouchEvent>e).touches[0].clientX;
         clientY = (<TouchEvent>e).touches[0].clientY;
