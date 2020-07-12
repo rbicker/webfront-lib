@@ -7,6 +7,7 @@ const extractLocation = (hash : string) : Array<string> => hash.replace(/^#\/?|\
 // router
 const router = (store : IStore) => {
   const propName = 'location';
+  const propNameOld = 'oldLocation';
 
   // move path to hash if no hash is in url on page load
   if (window.location.hash === '') {
@@ -16,6 +17,7 @@ const router = (store : IStore) => {
 
   // set first location on page load
   store.set(propName, extractLocation(window.location.hash));
+  store.set(propNameOld, []);
 
   // subscribe to location changes
   // this might be done by the application
@@ -34,9 +36,12 @@ const router = (store : IStore) => {
   });
 
   // hash changed callback function
-  const handleHashChanged = () => {
+  const handleHashChanged = (e : HashChangeEvent) => {
     const location = extractLocation(window.location.hash);
+    const oldHash = e.oldURL.replace(/^(http[s]?:\/\/)?[^/]+[/]?/g, '');
+    const oldLocation = extractLocation(oldHash);
     logger.debug(`hashchange window eventlistener was invoked, got location: ${location.join('/')}`);
+    store.set(propNameOld, oldLocation);
     store.set(propName, location);
   };
 
