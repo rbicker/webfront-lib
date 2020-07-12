@@ -43,6 +43,8 @@ cat << EOF > .gitignore
 node_modules/
 build/
 .cache/
+.env
+.env.prod
 EOF
 
 # add readme
@@ -196,7 +198,7 @@ EOF
   // add scripts
   "scripts": {
     "dev": "parcel src/index.html --out-dir build/debug",
-    "build": "parcel build src/index.html --out-dir build/release --public-url ./"
+    "build": "NODE_ENV=prod parcel build src/index.html --out-dir build/release --public-url ./"
   },
   // ...
 ```
