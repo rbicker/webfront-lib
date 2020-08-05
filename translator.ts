@@ -10,6 +10,8 @@ export default class Translator {
 
   defaultLanguage : string = 'en';
 
+  supportedLanguages : string[] = ['en'];
+
   path : string = '/i18n';
 
   constructor(store : IStore) {
@@ -25,20 +27,33 @@ export default class Translator {
     this.defaultLanguage = defaultLanguage;
   }
 
+  setSupportedLanguages(supportedLanguages : string[]) {
+    this.supportedLanguages = supportedLanguages;
+  }
+
   setPath(path : string) {
     this.path = path;
   }
 
   // getLanguage gets the user's lanuage either from
-  // store or from browser.
+  // store or from browser. If language is not supported,
+  // return default language.
   getLanguage() {
     if (this.store.state.language) {
+      if (!this.supportedLanguages.includes(this.store.state.language)) {
+        this.store.set('language', this.defaultLanguage);
+        return this.defaultLanguage;
+      }
       return this.store.state.language;
     }
     const lang = navigator.languages
       ? navigator.languages[0]
       : navigator.language;
     const l = lang.substr(0, 2);
+    if (!this.supportedLanguages.includes(l)) {
+      this.store.set('language', this.defaultLanguage);
+      return this.defaultLanguage;
+    }
     this.store.set('language', l);
     return l;
   }
