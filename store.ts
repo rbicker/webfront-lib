@@ -114,7 +114,7 @@ export default class ApplicationStore implements Store {
 
   /**
    * reset the application state to it's initial state.
-   * Be careful, only one event named 'state' will be published, if you use this method
+   * Be careful, only one event (named 'reset' by default) will be published, if you use this method
    * be sure to subscribe to state on a high level to reload your whole app.
    */
   resetState(event = 'reset') : void {

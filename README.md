@@ -136,6 +136,9 @@ cat << EOF > src/index.html
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="/public/css/normalize.css">
+    <link rel="stylesheet" href="/public/css/skeleton.css">
     <link rel="stylesheet" href="/public/css/style.scss">
     <title>Hello World</title>
   </head>
@@ -148,16 +151,18 @@ EOF
 
 # store.js
 cat << EOF > src/store.ts
+import ApplicationStore, { Store } from './lib/store';
+
 type AppState = {};
 
 const initialState : AppState = {};
 
 // save initial state, with persist set to true
-export default new Store(initialState, true);
+export default new ApplicationStore(initialState, true);
 
 // method to reset state
 const resetStore = (store: Store) : void => {
-  store.resetState();
+  store.resetState('reset');
 };
 
 export {
