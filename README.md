@@ -172,7 +172,27 @@ export {
 EOF
 
 # app.ts
+cat << EOF > src/components/app.ts
+import Component from '../lib/component';
+import { html, render } from '../lib/html';
 
+export default class App extends Component {
+  constructor() {
+    super({
+      element: <HTMLElement>document.getElementById('app'),
+    });
+  }
+
+  render() : void {
+    const content = html`
+      <div class="container main">
+        <h3>Hello world</h3>
+      </div>
+    `;
+    render(this.element, content);
+  }
+}
+EOF
 
 # index.ts
 cat << EOF > src/index.ts
