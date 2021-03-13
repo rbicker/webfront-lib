@@ -1,12 +1,12 @@
 import logger from './logger';
-import { IStore } from './store';
+import { Store } from './store';
 
 // parameters for the base component's constructor
 interface Params{
   props?: any;
   element: HTMLElement;
   renderTriggers?: string[];
-  store?: IStore;
+  store?: Store;
 }
 
 // base component
@@ -17,7 +17,7 @@ export default class Component {
 
   state: any;
 
-  store: IStore|undefined;
+  store: Store|undefined;
 
   constructor(params: Params) {
     this.props = params.props || {};
@@ -32,17 +32,18 @@ export default class Component {
       params.renderTriggers.forEach((trigger) => {
         // use event queue to trigger render to avoid race conditions
         // between javascript and browser rendering
-        (<IStore> this.store).subscribe(trigger, () => setTimeout(() => { this.render(); }, 0));
+        (<Store> this.store).subscribe(trigger, () => setTimeout(() => { this.render(); }, 0));
       });
     }
   }
 
   // change the component's state
-  setState = (newState: object) => {
+  setState = (newState: Record<string, unknown>) => {
     this.state = { ...this.state, ...newState };
     setTimeout(() => { this.render(); }, 0);
   };
 
   // render the inner html
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   render() {} // eslint-disable-line class-methods-use-this
 }

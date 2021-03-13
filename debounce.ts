@@ -1,6 +1,5 @@
-
 // debounce given function with given timer
-export default function (func: Function, wait: number) {
+export default function debounce(func: Function, wait: number) {
   let timeout : number;
   // debounced function
   return function debounced(this: any, ...args : any) {

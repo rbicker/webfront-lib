@@ -1,11 +1,11 @@
-import { IStore } from './store';
+import { Store } from './store';
 import logger from './logger';
 
 // extract location from hash
 const extractLocation = (hash : string) : Array<string> => hash.replace(/^#\/?|\/$/g, '').split('/');
 
 // router
-const router = (store : IStore) => {
+const router = (store : Store) => {
   const propName = 'location';
   const propNameOld = 'oldLocation';
 

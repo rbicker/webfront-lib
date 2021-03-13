@@ -1,10 +1,10 @@
-import { IStore } from './store';
+import { Store } from './store';
 import logger from './logger';
 
 export default class Translator {
   static instance : Translator;
 
-  store : IStore;
+  store : Store;
 
   cache : Map<string, any> = new Map();
 
@@ -14,7 +14,7 @@ export default class Translator {
 
   path : string = '/i18n';
 
-  constructor(store : IStore) {
+  constructor(store : Store) {
     // singleton
     if (!Translator.instance) {
       Translator.instance = this;

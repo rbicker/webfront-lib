@@ -40,10 +40,11 @@ touch src/public/css/style.scss
 # init git
 git init
 cat << EOF > .gitignore
+.DS_Store
 node_modules/
 build/
 .cache/
-.env*
+.env*.local
 EOF
 
 # add readme
@@ -81,16 +82,16 @@ EOF
 
 # nodejs
 npm init
-npm install --save-dev typescript parcel sass
+npm install --save-dev typescript parcel sass @types/node
 
 # eslint
 npm install --save-dev eslint
 #npx install-peerdeps --dev eslint-config-airbnb
 npx eslint --init
-How would you like to use ESLint? · style
-What type of modules does your project use? · none
+How would you like to use ESLint? · syntax, problems, style
+What type of modules does your project use? · javascript modules
 Which framework does your project use? · none
-Does your project use TypeScript? · No / Yes
+Does your project use TypeScript? · Yes
 Where does your code run? · browser
 How would you like to define a style for your project? · guide
 Which style guide do you want to follow? · airbnb
@@ -106,18 +107,19 @@ git submodule add https://github.com/rbicker/webfront-lib src/lib
 # tsconfig.json
 cat << EOF > tsconfig.json
 {
-    "compilerOptions": {
-      "target": "es5",                          /* Specify ECMAScript target version: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017', 'ES2018', 'ES2019' or 'ESNEXT'. */
-      "module": "commonjs",                     /* Specify module code generation: 'none', 'commonjs', 'amd', 'system', 'umd', 'es2015', or 'ESNext'. */
-      "strict": true,                           /* Enable all strict type-checking options. */
-      "esModuleInterop": true,                  /* Enables emit interoperability between CommonJS and ES Modules via creation of namespace objects for all imports. Implies 'allowSyntheticDefaultImports'. */
-      "forceConsistentCasingInFileNames": true,  /* Disallow inconsistently-cased references to the same file. */
-      "lib": [ "dom", "es2015" ]
-    },
-    "include": [
-        "src/**/*"
-    ]
-  }
+  "compilerOptions": {
+    "target": "es5",                          /* Specify ECMAScript target version: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017', 'ES2018', 'ES2019' or 'ESNEXT'. */
+    "module": "commonjs",                     /* Specify module code generation: 'none', 'commonjs', 'amd', 'system', 'umd', 'es2015', or 'ESNext'. */
+    "strict": true,                           /* Enable all strict type-checking options. */
+    "esModuleInterop": true,                  /* Enables emit interoperability between CommonJS and ES Modules via creation of namespace objects for all imports. Implies 'allowSyntheticDefaultImports'. */
+    "forceConsistentCasingInFileNames": true,  /* Disallow inconsistently-cased references to the same file. */
+    "lib": [ "ESNext", "DOM", "DOM.Iterable" ],
+    "downlevelIteration": true
+  },
+  "include": [
+      "src/**/*"
+  ]
+}
 EOF
 
 # declarations.d.ts
@@ -146,12 +148,22 @@ EOF
 
 # store.js
 cat << EOF > src/store.ts
-import { Store } from './lib/store';
+type AppState = {};
 
-const initialState = {};
+const initialState : AppState = {};
 
 // save initial state, with persist set to true
 export default new Store(initialState, true);
+
+// method to reset state
+const resetStore = (store: Store) : void => {
+  store.resetState();
+};
+
+export {
+  AppState,
+  resetStore,
+};
 EOF
 
 # app.ts
@@ -190,7 +202,7 @@ COPY --from=builder /usr/local/src/spt/build/release/ /usr/share/nginx/html
 EOF
 ```
 
-## configuration
+## adjust configurations
 ### package.json
 ```json
   // ...
@@ -202,45 +214,34 @@ EOF
   // ...
 ```
 
-### tsconfig.json
-```json
-{
-  "compilerOptions": {
-    // ...
-    "lib": [ "dom", "es2015" ]
-    // ...
-  },
-  "include": [
-      "src/**/*"
-  ]
-}
-```
-
 ### .eslintrc.js
 ```javascript
 module.exports = {
   // ...
   rules: {
+    '@typescript-eslint/explicit-module-boundary-types': 'off',
+    '@typescript-eslint/no-explicit-any': 'off',
     'import/extensions': [
       'error',
       'ignorePackages',
       {
-        'js': 'never',
-        'jsx': 'never',
-        'ts': 'never',
-        'tsx': 'never',
-      }
-   ],
+        js: 'never',
+        jsx: 'never',
+        ts: 'never',
+        tsx: 'never',
+      },
+    ],
   },
   settings: {
     'import/resolver': {
       node: {
         paths: ['src'],
-        extensions: ['.js', '.jsx', '.ts', '.jsx']
-      }
+        extensions: ['.js', '.jsx', '.ts', '.jsx'],
+      },
     },
   },
 };
+
 ```
 
 

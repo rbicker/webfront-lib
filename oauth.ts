@@ -1,4 +1,3 @@
-
 // generate a random string
 const generateRandomString = () => {
   const array = new Uint32Array(28);

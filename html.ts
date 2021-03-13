@@ -1,38 +1,41 @@
 import logger from './logger';
 
-// regex to match id attribute
-const reId = /(<|\s)id\s*=\s*("|')\S+("|')/g;
+// match an indicator (? or @), at least one none-whitespace char
+// plus an equal sign at the end of the string
+const reAttr = /[?,@]\S+\s*=\s*$/;
 
 // random id to use to identify comment-marker
 const htmlId = Math.random().toString(36).substring(2, 15)
   + Math.random().toString(36).substring(2, 15);
 
-// eventObjects
-interface EventObject {
+// EventListener interface to describe the handleEvent function
+// and the eventType
+interface EventListener {
   handleEvent: (evt : Event) => void;
-  options: object;
-  id: string;
+  options: Record<string, unknown>;
   type: string;
 }
-const eventObjects = new Map<string, EventObject[]>();
 
-// html template literals function
+// map templateId to
+// map of eventListenerSelector to EventListener
+const eventListeners = new Map<string, Map<string, EventListener>>();
+
+// html creates an html-template which can then be rendered by using
+// the render function.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const html = (strings : TemplateStringsArray, ...values : any[]) : string => {
   // identify current template
   const templateId = Math.random().toString(36).substring(2, 15)
   // add a comment with template id
   + Math.random().toString(36).substring(2, 15);
-  let out = `<!-- ${htmlId}-${templateId} -->`;
+  let out = `<!-- tmpl-${htmlId}-${templateId} -->`;
 
-  // eventobjects
-  const evtObjects : EventObject[] = [];
+  // listeners
+  const listeners = new Map<string, EventListener>();
 
   // loop trough strings
   strings.forEach((str, i) => {
     let res = `${str}${values[i] || ''}`;
-    // match an indicator (? or @), at least one none-whitespace char
-    // plus an equal sign at the end of the string
-    const reAttr = /[?,@]\S+\s*=\s*$/;
     const matchesAttr = str.match(reAttr);
     if (matchesAttr) {
       // first character indicates how to handle the value
@@ -52,79 +55,18 @@ const html = (strings : TemplateStringsArray, ...values : any[]) : string => {
           // remove the attribute
           res = str.replace(reAttr, '');
           break;
-        case '@': { // event handler
+        case '@': { // add event listener
           res = str.replace(reAttr, ''); // remove attribute, it should never be in the html
           if (!values[i].handleEvent || typeof values[i].handleEvent !== 'function') {
             // https://developer.mozilla.org/de/docs/Web/API/EventListener interface
             logger.error(`the object passed to ${attr} does not provide a function named handleEvent: ${strings.raw}`);
             break;
           }
-          // regexes
-          const reElemStart = /<[^<]*$/g;
-          const reElemEnd = />/g;
-
-          let idAttr;
-          // search for id before the current position
-          for (let j = i; j >= 0; j -= 1) {
-            const matchesId = strings[j].match(reId);
-            if (matchesId) {
-              const found = <string>matchesId[matchesId.length - 1];
-              const indexFound = strings[j].indexOf(found);
-              // start searching after the index of the match
-              const indexElementStart = strings[j].slice(indexFound).search(reElemStart);
-              if (indexElementStart > 0) {
-                // id was found in an element before the current one
-                break;
-              }
-              idAttr = found;
-              break;
-            }
-            const indexElementStart = strings[j].search(reElemStart);
-            // if attribute beginning was reached
-            if (indexElementStart > 0) {
-              break;
-            }
-          }
-
-          if (!idAttr) {
-            // search for id after the current position
-            for (let j = i + 1; j < strings.length - 1; j += 1) {
-              const matchesId = strings[j].match(reId);
-              const indexElemEnd = strings[j].search(reElemEnd);
-              if (matchesId) {
-                if (indexElemEnd > 0
-                  && strings[j].search(reId) > indexElemEnd) {
-                  // id was found in an element after the current one
-                  break;
-                }
-                idAttr = <string>matchesId[0];
-                break;
-              }
-              // if attribute end was reached
-              if (indexElemEnd > 0) {
-                break;
-              }
-            }
-          }
-
-          let id;
-          if (!idAttr) {
-            id = Math.random().toString(36).substring(2, 15)
-              + Math.random().toString(36).substring(2, 15);
-          } else {
-            // remove everything before and after the actual id
-            id = idAttr.replace(/^(<|\s)id\s*=\s*["']/, '');
-            id = id.replace(/["']$/, '');
-          }
-          // add to event objects
-          evtObjects.push({
-            handleEvent: values[i].handleEvent,
-            type: attr,
-            id,
-            options: values[i].options,
-          });
-          // add id
-          res += `id="${id}"`;
+          // generate event listener id by which the element can be found while rendering
+          const listenerId = Math.random().toString(36).substring(2, 15);
+          const selector = `data-el-${listenerId}="1"`;
+          res = `${res} ${selector}`; // add selector to html
+          listeners.set(selector, { ...values[i], type: attr });
           break;
         }
         default:
@@ -134,13 +76,15 @@ const html = (strings : TemplateStringsArray, ...values : any[]) : string => {
     }
     out += res;
   });
-  eventObjects.set(templateId, evtObjects);
+  if (listeners.size > 0) {
+    eventListeners.set(templateId, listeners);
+  }
   return out;
 };
 
 // render the content as innerHTML of the given element
 // also adds event listeners if necessary
-const render = function render(element : HTMLElement | null, content :string) {
+const render = function render(element : HTMLElement | null, content :string) : void {
   const elem = element;
   if (elem === null) {
     logger.error(`null element in render function, cannot render content: ${content}`);
@@ -148,28 +92,31 @@ const render = function render(element : HTMLElement | null, content :string) {
   }
   elem.innerHTML = content;
   // find template markers using html id
-  const reComment = new RegExp(`${htmlId}-\\S+`, 'g');
+  const reComment = new RegExp(`tmpl-${htmlId}-\\S+`, 'g');
   const matches = content.match(reComment);
   if (!matches) {
     logger.error(`html id '${htmlId}' id not found in content: ${content}`);
     return;
   }
-  const reHtmlId = new RegExp(`${htmlId}-`);
+  const reHtmlId = new RegExp(`tmpl-${htmlId}-`);
   // we need to loop because multiple template id's can be handled by a single render function
   matches.forEach((match) => {
     const templateId = match.replace(reHtmlId, '').trimRight();
-    // get event listeners
-    const evtObjects = eventObjects.get(templateId);
-    if (evtObjects) {
-      evtObjects.forEach((eo) => {
-        const el = document.getElementById(eo.id);
-        if (!el) {
-          logger.error(`html element with id ${eo.id} not found, unable to add event listener on ${eo.type}`);
-          return;
+    // get all handlers for given template
+    const handlers = eventListeners.get(templateId);
+    if (handlers) {
+      handlers.forEach((h, selector) => {
+        // find element to which handler was bound
+        const e = elem.querySelector(`[${selector}]`);
+        if (e) {
+          // add event listener
+          e.addEventListener(h.type, h.handleEvent, h.options);
+        } else {
+          logger.error(`element not found using selector: ${selector}`);
         }
-        el.addEventListener(eo.type, eo);
       });
     }
+    eventListeners.delete(templateId);
   });
 };
 
