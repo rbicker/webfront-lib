@@ -1,51 +1,114 @@
-import { Store } from './store';
 import logger from './logger';
+import { Store } from './store';
 
-// extract location from hash
-const extractLocation = (hash : string) : Array<string> => hash.replace(/^#\/?|\/$/g, '').split('/');
+// parameters
+interface Params{
+  store: Store;
+}
 
-// router
-const router = (store : Store) => {
-  const propName = 'location';
-  const propNameOld = 'oldLocation';
+// Router implements router to match paths against (regexp) routes.
+// If a route matches, a callback function is being run which has access
+// to the store and the named regexp groups. If the callback function returns
+// true, no additional routes will be processed.
+export default class Router {
+  store: Store;
 
-  // move path to hash if no hash is in url on page load
-  if (window.location.hash === '') {
-    window.location.hash = `${window.location.pathname}`;
-    window.location.pathname = '';
+  routes: {
+    re: RegExp,
+    cb: (store: Store, groups: {[key: string]: string}|undefined) => boolean
+  }[] = [];
+
+  /**
+   * constructor
+   * @param params Parameters for the router
+   */
+  constructor(params: Params) {
+    this.store = params.store;
   }
 
-  // set first location on page load
-  store.set(propName, extractLocation(window.location.hash));
-  store.set(propNameOld, []);
+  /**
+   * add a route (regexp) and a callback function.
+   * @param re regular expression to match the route
+   * @param cb callback function which is being run when a route matches,
+   * returns true to finish routing
+   */
+  addRoute(re: RegExp, cb: (store: Store, groups: {[key: string]: string}|undefined) => boolean) {
+    logger.debug(`added route ${re}`);
+    this.routes.push({
+      re,
+      cb,
+    });
+  }
 
-  // subscribe to location changes
-  // this might be done by the application
-  // set url accordingly
-  store.subscribe(propName, () => {
-    if (typeof store.state[propName] !== 'object') {
-      logger.error(`unexpected value in store for key ${propName}, expected array`);
-      return;
-    }
-    const oldPath = extractLocation(window.location.hash).join('/');
-    const newPath = store.state[propName].join('/');
-    if (oldPath !== newPath) {
-      logger.debug(`location hash has been changed programmatically from "${oldPath}" to "${newPath}"`);
-      window.location.hash = `/${newPath}`;
-    }
-  });
+  /**
+   * first is a callback for routes which takes a list of names and updates the first
+   * state (by names) that has a different value than the one given in the route.
+   * @param names
+   * @returns true
+   */
+  first(...names : string[]): (store: Store, groups: {[key: string]: string}|undefined) => boolean {
+    return (store: Store, groups: {[key: string]: string}|undefined) => {
+      if (!groups) {
+        logger.error('no named groups in path');
+        return true;
+      }
+      names.some((name) => {
+        const value = groups[name];
+        // if state is changing
+        if (this.store.state[name] !== groups[name]) {
+          this.store.set(name, value);
+          return true;
+        }
+        return false;
+      });
+      return true;
+    };
+  }
 
-  // hash changed callback function
-  const handleHashChanged = (e : HashChangeEvent) => {
-    const location = extractLocation(window.location.hash);
-    const oldHash = e.oldURL.replace(/^(http[s]?:\/\/)?[^/]+[/]?/g, '');
-    const oldLocation = extractLocation(oldHash);
-    logger.debug(`hashchange window eventlistener was invoked, got location: ${location.join('/')}`);
-    store.set(propNameOld, oldLocation);
-    store.set(propName, location);
-  };
+  // todo: path builder that replaces named groups?
+  // https://javascript.info/regexp-groups#capturing-groups-in-replacement
+  // maybe the current state will be used as starting point, and
+  // all the given key(group name)/value(string in url) pairs will be replaced?
 
-  window.addEventListener('hashchange', handleHashChanged, false);
-};
+  /**
+   * handlePath tries to match the given path.
+   * If a route matches the path, the route's
+   * callback function is being called.
+   * @param path the path to handle
+   */
+  handlePath(path : string) {
+    logger.debug(`router is handling path "${path}"`);
+    this.routes.some((route) : boolean => {
+      const match = path.match(route.re);
+      if (match) {
+        logger.debug(`path "${path}" matched route ${route.re}`);
+        return route.cb(this.store, match.groups);
+      }
+      return false;
+    });
+    window.history.pushState({}, (window as any).title || path, path);
+  }
 
-export { router, extractLocation };
+  /**
+   * getClickHandler return a function which can
+   * be used a a click event handler.
+   * @returns function which can be used as a click event handler
+   */
+  getClickHandler(): (event : InputEvent) => void {
+    const self = this;
+    return (event : InputEvent) => {
+      let url = (event.target as HTMLElement).getAttribute('href') || '';
+      // do not handle external urls
+      if (new URL(url).origin !== window.location.origin) {
+        return;
+      }
+      // stop the browser from navigating to the destination url
+      event.preventDefault();
+      // remove the leading slash
+      if (url.length > 0 && url.charAt(0) === '/') {
+        url = url.slice(1);
+      }
+      self.handlePath(url);
+    };
+  }
+}
