@@ -122,11 +122,12 @@ cat << EOF > tsconfig.json
 }
 EOF
 
-# declarations.d.ts
-cat << EOF > src/declarations.d.ts
-declare module '*.png'
-declare module '*.jpg'
-declare module '*.svg'
+# .parcelrc
+cat << EOF > .parcelrc
+{
+	"extends": "@parcel/config-default",
+	"resolvers": ["@mischnic/parcel-resolver-root", "..."]
+}
 EOF
 
 # index.html
@@ -241,7 +242,7 @@ EOF
   },
 	"@mischnic/parcel-resolver-root": {
 		"/": "./src"
-	}
+	},
   // ...
 ```
 
