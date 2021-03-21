@@ -212,10 +212,13 @@ RUN npm install && npm run build
 FROM nginx
 RUN echo '\n\
 server {\n\
-    listen   80;\n\
+    listen 80;\n\
     root /usr/share/nginx/html;\n\
     index index.html;\n\
     server_name _;\n\
+    location /not-found {\n\
+        return 404;\n\
+    }\n\
     location / {\n\
         try_files $uri /index.html;\n\
     }\n\
