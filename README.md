@@ -43,7 +43,7 @@ cat << EOF > .gitignore
 .DS_Store
 node_modules/
 build/
-.cache/
+.parcel-cache/
 .env*.local
 EOF
 
