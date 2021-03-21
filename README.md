@@ -82,7 +82,7 @@ EOF
 
 # nodejs
 npm init
-npm install --save-dev typescript parcel sass @types/node
+npm install --save-dev typescript parcel sass @types/node @mischnic/parcel-resolver-root
 
 # eslint
 npm install --save-dev eslint
@@ -137,9 +137,9 @@ cat << EOF > src/index.html
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
-    <link rel="stylesheet" href="./public/css/normalize.css">
-    <link rel="stylesheet" href="./public/css/skeleton.css">
-    <link rel="stylesheet" href="./public/css/style.scss">
+    <link rel="stylesheet" href="/public/css/normalize.css">
+    <link rel="stylesheet" href="/public/css/skeleton.css">
+    <link rel="stylesheet" href="/public/css/style.scss">
     <title>Hello World</title>
   </head>
   <body>
@@ -239,6 +239,9 @@ EOF
     "dev": "parcel src/index.html --dist-dir build/debug",
     "build": "NODE_ENV=production parcel build src/index.html --dist-dir build/release --public-url ./"
   },
+	"@mischnic/parcel-resolver-root": {
+		"/": "./src"
+	}
   // ...
 ```
 
