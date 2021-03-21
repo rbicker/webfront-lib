@@ -137,9 +137,9 @@ cat << EOF > src/index.html
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
-    <link rel="stylesheet" href="/public/css/normalize.css">
-    <link rel="stylesheet" href="/public/css/skeleton.css">
-    <link rel="stylesheet" href="/public/css/style.scss">
+    <link rel="stylesheet" href="./public/css/normalize.css">
+    <link rel="stylesheet" href="./public/css/skeleton.css">
+    <link rel="stylesheet" href="./public/css/style.scss">
     <title>Hello World</title>
   </head>
   <body>
@@ -233,8 +233,8 @@ EOF
   // ...
   // add scripts
   "scripts": {
-    "dev": "parcel src/index.html --out-dir build/debug",
-    "build": "NODE_ENV=production parcel build src/index.html --out-dir build/release --public-url ./"
+    "dev": "parcel src/index.html --dist-dir build/debug",
+    "build": "NODE_ENV=production parcel build src/index.html --dist-dir build/release --public-url ./"
   },
   // ...
 ```
