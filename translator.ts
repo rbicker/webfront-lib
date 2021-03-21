@@ -12,7 +12,7 @@ export default class Translator {
 
   supportedLanguages : string[] = ['en'];
 
-  path : string = '/i18n';
+  baseUrl : string = '/i18n';
 
   constructor(store : Store) {
     // singleton
@@ -31,8 +31,8 @@ export default class Translator {
     this.supportedLanguages = supportedLanguages;
   }
 
-  setPath(path : string) {
-    this.path = path;
+  setBaseUrl(url : string) {
+    this.baseUrl = url;
   }
 
   // getLanguage gets the user's lanuage either from
@@ -65,13 +65,13 @@ export default class Translator {
     if (this.cache.has(l)) {
       return;
     }
-    const path = `${this.path}/${l}.json`;
+    const url = `${this.baseUrl}/${l}.json`;
     try {
-      const res = await fetch(path);
+      const res = await fetch(url);
       const json = await res.json();
       this.cache.set(l, json);
     } catch (err) {
-      logger.error(`unable to fetch language file from ${path}: ${err}`);
+      logger.error(`unable to fetch language file from ${url}: ${err}`);
     }
   }
 
