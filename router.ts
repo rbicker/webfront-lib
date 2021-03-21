@@ -46,6 +46,7 @@ export default class Router {
    * @param names
    * @returns true
    */
+  // eslint-disable-next-line class-methods-use-this
   first(...names : string[]): (store: Store, groups: {[key: string]: string}|undefined) => boolean {
     return (store: Store, groups: {[key: string]: string}|undefined) => {
       if (!groups) {
@@ -55,8 +56,8 @@ export default class Router {
       names.some((name) => {
         const value = groups[name];
         // if state is changing
-        if (this.store.state[name] !== groups[name]) {
-          this.store.set(name, value);
+        if (store.state[name] !== groups[name]) {
+          store.set(name, value);
           return true;
         }
         return false;
@@ -71,6 +72,7 @@ export default class Router {
    * @param names
    * @returns true
    */
+  // eslint-disable-next-line class-methods-use-this
   all(...names : string[]): (store: Store, groups: {[key: string]: string}|undefined) => boolean {
     return (store: Store, groups: {[key: string]: string}|undefined) => {
       if (!groups) {
@@ -80,8 +82,8 @@ export default class Router {
       names.forEach((name) => {
         const value = groups[name];
         // if state is changing
-        if (this.store.state[name] !== groups[name]) {
-          this.store.set(name, value);
+        if (store.state[name] !== groups[name]) {
+          store.set(name, value);
         }
       });
       return true;
