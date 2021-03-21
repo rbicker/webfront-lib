@@ -124,14 +124,14 @@ export default class Router {
         // do not handle if not a link
         return;
       }
-      if (new URL(elem.href).origin !== window.location.origin) {
-        // do not handle external link
+      // only handle internal paths
+      const href = target.getAttribute('href');
+      if (!href || href.length === 0 || href.charAt(0) !== "/" ){
         return;
       }
       // stop the browser from navigating to the destination url
       event.preventDefault();
       // handle path
-      const href = target.getAttribute('href') || '';
       self.handlePath(href);
     };
   }

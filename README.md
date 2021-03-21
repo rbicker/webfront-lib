@@ -205,8 +205,8 @@ EOF
 # Dockerfile
 cat << EOF > Dockerfile
 FROM node:alpine AS builder
-COPY . /usr/local/src/spt
-WORKDIR /usr/local/src/spt
+COPY . /usr/local/src/site
+WORKDIR /usr/local/src/site
 RUN npm install && npm run build
 
 FROM nginx
@@ -226,7 +226,7 @@ server {\n\
 \n'\
 > /etc/nginx/conf.d/default.conf
 RUN rm -rf /usr/share/nginx/html/*
-COPY --from=builder /usr/local/src/spt/build/release/ /usr/share/nginx/html
+COPY --from=builder /usr/local/src/site/build/release/ /usr/share/nginx/html
 EOF
 ```
 
