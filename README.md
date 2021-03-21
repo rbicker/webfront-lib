@@ -144,7 +144,7 @@ cat << EOF > src/index.html
   </head>
   <body>
     <div id="app"></div>
-    <script src="index.ts"></script>
+    <script src="/index.ts"></script>
   </body>
 </html>
 EOF
