@@ -65,10 +65,28 @@ export default class Router {
     };
   }
 
-  // todo: path builder that replaces named groups?
-  // https://javascript.info/regexp-groups#capturing-groups-in-replacement
-  // maybe the current state will be used as starting point, and
-  // all the given key(group name)/value(string in url) pairs will be replaced?
+  /**
+   * all is a callback for routes which takes a list of names and updates all
+   * states (by names) that have different values than the ones given in the route.
+   * @param names
+   * @returns true
+   */
+  all(...names : string[]): (store: Store, groups: {[key: string]: string}|undefined) => boolean {
+    return (store: Store, groups: {[key: string]: string}|undefined) => {
+      if (!groups) {
+        logger.error('no named groups in path');
+        return true;
+      }
+      names.forEach((name) => {
+        const value = groups[name];
+        // if state is changing
+        if (this.store.state[name] !== groups[name]) {
+          this.store.set(name, value);
+        }
+      });
+      return true;
+    };
+  }
 
   /**
    * handlePath tries to match the given path.
@@ -77,11 +95,12 @@ export default class Router {
    * @param path the path to handle
    */
   handlePath(path : string) {
-    logger.debug(`router is handling path "${path}"`);
+    const p = path.toLocaleLowerCase();
+    logger.debug(`router is handling path "${p}"`);
     this.routes.some((route) : boolean => {
-      const match = path.match(route.re);
+      const match = p.match(route.re);
       if (match) {
-        logger.debug(`path "${path}" matched route ${route.re}`);
+        logger.debug(`path "${p}" matched route ${route.re}`);
         return route.cb(this.store, match.groups);
       }
       return false;
@@ -91,24 +110,27 @@ export default class Router {
 
   /**
    * getClickHandler return a function which can
-   * be used a a click event handler.
+   * be used as a click event handler for document.
    * @returns function which can be used as a click event handler
    */
-  getClickHandler(): (event : InputEvent) => void {
+  getClickHandler(): (event : MouseEvent) => void {
     const self = this;
-    return (event : InputEvent) => {
-      let url = (event.target as HTMLElement).getAttribute('href') || '';
-      // do not handle external urls
-      if (new URL(url).origin !== window.location.origin) {
+    return (event : MouseEvent) => {
+      const target = event.target as HTMLElement;
+      const elem = target.closest('a');
+      if (!elem) {
+        // do not handle if not a link
+        return;
+      }
+      if (new URL(elem.href).origin !== window.location.origin) {
+        // do not handle external link
         return;
       }
       // stop the browser from navigating to the destination url
       event.preventDefault();
-      // remove the leading slash
-      if (url.length > 0 && url.charAt(0) === '/') {
-        url = url.slice(1);
-      }
-      self.handlePath(url);
+      // handle path
+      const href = target.getAttribute('href') || '';
+      self.handlePath(href);
     };
   }
 }
