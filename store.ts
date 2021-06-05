@@ -3,8 +3,6 @@ import logger from './logger';
 // Store describes an interace that can be used to save a state.
 interface Store{
   set: (propertyString: string, value: any)=>void;
-  publish: (event : string, data: any)=>void;
-  subscribe: (event : string, callback:(data: any) => void)=>void;
   resetState:(event : string) => void;
   readonly state: { [key: string]: any };
 }
@@ -17,6 +15,10 @@ export default class ApplicationStore implements Store {
 
   state: { [key: string]: unknown };
 
+  name : string;
+
+  context: typeof globalThis;
+
   persist: boolean;
 
   /**
@@ -28,6 +30,8 @@ export default class ApplicationStore implements Store {
     this.events = {};
     this.initialState = initialState || {};
     this.state = initialState || {};
+    this.name = 'appstate';
+    this.context = window;
     this.persist = persist || false;
     if (persist && localStorage.getItem('state')) { // load state from localstorage
       // overwrite initial state with the one loaded from localstorage
@@ -86,30 +90,20 @@ export default class ApplicationStore implements Store {
   }
 
   /**
-   * publish runs all the subcriber's callback for the event with the given name
+   * publish fires a custom event named this.name:event (so appstate:userid for example)
+   * to which components can subscribe by creating event listeners.
    *
    * @param event name of the event
    * @param data data to publish
    */
   publish(event : string, data = {}) : void {
-    if (!Object.prototype.hasOwnProperty.call(this.events, event)) {
-      return;
-    }
-    this.events[event].map((callback : (d: any) => void) => callback(data));
-  }
-
-  /**
-   * subscribe adds a subscriber to the store by mapping a callback function to the event
-   * with the given name.
-   *
-   * @param event name of the event
-   * @param callback callback function to run with the data ob the published event
-   */
-  subscribe(event : string, callback : (data: any) => void) : void {
-    if (!Object.prototype.hasOwnProperty.call(this.events, event)) {
-      this.events[event] = [];
-    }
-    this.events[event].push(callback);
+    const name = `${this.name}:${event}`;
+    this.context.dispatchEvent(
+      new CustomEvent(name, {
+        detail: { event, data },
+      }),
+    );
+    logger.debug(`store fired custom event "${name}"`);
   }
 
   /**

@@ -1,30 +1,18 @@
 import logger from './logger';
-import { Store } from './store';
 
-// parameters
-interface Params{
-  store: Store;
-}
-
-// Router implements router to match paths against (regexp) routes.
-// If a route matches, a callback function is being run which has access
-// to the store and the named regexp groups. If the callback function returns
-// true, no additional routes will be processed.
+/**
+ * Router implements a router to match paths against (regexp) routes.
+ * If a route matches, a callback function is being run which has access
+ * to the named regexp groups. The callback function(s) should run
+ * the next() function to proceed with the next handler.
+ */
 export default class Router {
-  store: Store;
-
   routes: {
     re: RegExp,
-    cb: (store: Store, groups: {[key: string]: string}|undefined) => boolean
+    cb: (next: () => void, groups: {[key: string]: string}|undefined) => void | Promise<void>
   }[] = [];
 
-  /**
-   * constructor
-   * @param params Parameters for the router
-   */
-  constructor(params: Params) {
-    this.store = params.store;
-  }
+  defaultRoute: ((path : string) => void) | undefined = undefined
 
   /**
    * add a route (regexp) and a callback function.
@@ -32,7 +20,10 @@ export default class Router {
    * @param cb callback function which is being run when a route matches,
    * returns true to finish routing
    */
-  addRoute(re: RegExp, cb: (store: Store, groups: {[key: string]: string}|undefined) => boolean) {
+  addRoute(re: RegExp,
+    cb: (
+      next: () => void,
+      groups: {[key: string]: string}|undefined) => void) {
     logger.debug(`added route ${re}`);
     this.routes.push({
       re,
@@ -41,73 +32,54 @@ export default class Router {
   }
 
   /**
-   * first is a callback for routes which takes a list of names and updates the first
-   * state (by names) that has a different value than the one given in the route.
-   * @param names
-   * @returns true
-   */
-  // eslint-disable-next-line class-methods-use-this
-  first(...names : string[]): (store: Store, groups: {[key: string]: string}|undefined) => boolean {
-    return (store: Store, groups: {[key: string]: string}|undefined) => {
-      if (!groups) {
-        logger.error('no named groups in path');
-        return true;
-      }
-      names.some((name) => {
-        const value = groups[name];
-        // if state is changing
-        if (store.state[name] !== groups[name]) {
-          store.set(name, value);
-          return true;
-        }
-        return false;
-      });
-      return true;
-    };
-  }
-
-  /**
-   * all is a callback for routes which takes a list of names and updates all
-   * states (by names) that have different values than the ones given in the route.
-   * @param names
-   * @returns true
-   */
-  // eslint-disable-next-line class-methods-use-this
-  all(...names : string[]): (store: Store, groups: {[key: string]: string}|undefined) => boolean {
-    return (store: Store, groups: {[key: string]: string}|undefined) => {
-      if (!groups) {
-        logger.error('no named groups in path');
-        return true;
-      }
-      names.forEach((name) => {
-        const value = groups[name];
-        // if state is changing
-        if (store.state[name] !== groups[name]) {
-          store.set(name, value);
-        }
-      });
-      return true;
-    };
-  }
-
-  /**
    * handlePath tries to match the given path.
-   * If a route matches the path, the route's
-   * callback function is being called.
+   * If routes match the path, the
+   * callback functions are being called.
    * @param path the path to handle
    */
   handlePath(path : string) {
     const p = path.toLocaleLowerCase();
     logger.debug(`router is handling path "${p}"`);
-    this.routes.some((route) : boolean => {
+
+    const matches : {
+      cb: (next: () => void, groups: {[key: string]: string}|undefined) => void
+      groups: {[key: string]: string}|undefined
+    }[] = [];
+
+    this.routes.forEach((route) => {
       const match = p.match(route.re);
       if (match) {
         logger.debug(`path "${p}" matched route ${route.re}`);
-        return route.cb(this.store, match.groups);
+        matches.push({ cb: route.cb, groups: match.groups });
       }
-      return false;
     });
+    if (matches.length > 0) {
+      this.runCallback(matches, 0);
+    } else if (this.defaultRoute) {
+      logger.debug(`running default route for path "${p}"`);
+      this.defaultRoute(path);
+    }
     window.history.pushState({}, (window as any).title || path, path);
+  }
+
+  /**
+   * runCallback runs the callback function from the given array at the given index.
+   * the function is responsible to create a next function which points to the next callback.
+   * @param matches array of matched routes, containing callback functions and regex groups
+   * @param index the index to the element in the matches array for which to run the callback
+   * @returns void
+   */
+  private runCallback(matches : {
+    cb: (next: () => void, groups: {[key: string]: string}|undefined) => void,
+    groups: {[key: string]: string}|undefined
+  }[], index : number) {
+    if (index >= matches.length) {
+      return;
+    }
+    const next = () => {
+      this.runCallback(matches, index + 1);
+    };
+    matches[index].cb(next, matches[index].groups);
   }
 
   /**
@@ -126,7 +98,7 @@ export default class Router {
       }
       // only handle internal paths
       const href = target.getAttribute('href');
-      if (!href || href.length === 0 || href.charAt(0) !== "/" ){
+      if (!href || href.length === 0 || href.charAt(0) !== '/') {
         return;
       }
       // stop the browser from navigating to the destination url

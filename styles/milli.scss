@@ -1,0 +1,88 @@
+@import 'variables';
+@import 'mixins';
+
+/* buttons ---------------------------------------------------- */
+
+/* primary color */
+.button-primary {
+  background-color: $--color-primary;
+  border-color: $--color-primary;
+  color: $--color-on-primary;
+}
+.button-primary.button-clear,
+.button-primary.button-outline {
+  background-color: transparent;
+  color: $--color-primary;
+}
+.button-primary.button-clear {
+  border-color: transparent;
+}
+
+/* secondary color */
+.button-secondary {
+  background-color: $--color-secondary;
+  border-color: $--color-secondary;
+  color: $--color-on-secondary;
+}
+.button-secondary.button-clear,
+.button-secondary.button-outline {
+  background-color: transparent;
+  color: $--color-secondary;
+}
+.button-secondary.button-clear {
+  border-color: transparent;
+}
+
+/* accent color */
+.button-accent {
+  background-color: $--color-accent;
+  border-color: $--color-accent;
+  color: $--color-on-accent;
+}
+.button-accent.button-clear,
+.button-accent.button-outline {
+  background-color: transparent;
+  color: $--color-accent;
+}
+.button-accent.button-clear {
+  border-color: transparent;
+}
+
+/* small button */
+.button-small {
+  font-size: .8rem;
+  height: 2.8rem;
+  line-height: 2.8rem;
+  padding: 0 1.5rem;
+}
+
+/* large button */
+.button-large {
+  font-size: 1.4rem;
+  height: 4.5rem;
+  line-height: 4.5rem;
+  padding: 0 2rem;
+}
+
+/* pres ------------------------------------------------------- */
+
+/* primary color */
+.pre-primary {
+  background: transparent;
+  border-left-color: $--color-primary;
+  overflow-y: hidden;
+}
+
+/* secondary color */
+.pre-secondary {
+  background: transparent;
+  border-left-color: $--color-secondary;
+  overflow-y: hidden;
+}
+
+/* accent color */
+.pre-accent {
+  background: transparent;
+  border-left-color: $--color-accent;
+  overflow-y: hidden;
+}

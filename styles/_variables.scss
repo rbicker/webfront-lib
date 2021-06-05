@@ -1,0 +1,18 @@
+// assign css variables to scss variables
+
+$--color-background: --color-background; /* main background color */
+$--color-on-background: --color-on-background; /* color for text on background */ 
+$--color-surface: --color-surface; /* surface (main container for example) */ 
+$--color-on-surface: --color-on-surface; /* color for text on surface */
+$--color-primary: --color-primary; /* primary color for buttons, etc */
+$--color-on-primary: --color-on-primary; /* color for text on primary */ 
+$--color-secondary: --color-secondary; /* secondary color, a darker or lighter shape of the primary color */
+$--color-on-secondary: --color-on-secondary; /* color for text on secondary */ 
+$--color-accent: --color-accent; /* color to set accents, less than 10% of the web application */ 
+$--color-on-accent: --color-on-accent; /* color for text on accent */
+$--color-success: --color-success; /* color for success state */
+$--color-on-success: --color-on-success; /* color for text on success state */
+$--color-warning: --color-warning; /* color for warning state */
+$--color-on-warning: --color-on-warning; /* color for text on warning state */
+$--color-error: --color-error; /* color for error state */
+$--color-on-error: --color-on-error; /* color for text on error state */
