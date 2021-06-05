@@ -20,6 +20,7 @@ please note the undocumented classes, functions and components are currently a w
 * use parcel as bundler (https://parceljs.org/)
 * use lit (https://lit.dev), a libary to create webcomponents
 * use git (-hub) for your source code
+* use something like the gitlab flow (feature branches)
 * use semantic versioning for your project, (git-)tag your versions (https://semver.org/spec/v2.0.0.html)
 * keep a changelog (https://keepachangelog.com)
 * add a license for your open source projects, I mostly use MIT when i get to decide
