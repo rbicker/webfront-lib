@@ -3,7 +3,7 @@ after creating the project structure and all the required files, you should now 
 ```bash
 npm run dev
 ```
-whenever you change your source scss files, do not forget to generate the lit-css files.
+whenever you change your source (s)css files, do not forget to generate the lit-css files.
 ```bash
 npm run build-css
 ```

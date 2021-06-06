@@ -1,20 +1,80 @@
 @import 'variables';
 @import 'mixins';
 
+/* inputs ----------------------------------------------------- */
+
+input[type='color']:focus,
+input[type='date']:focus,
+input[type='datetime']:focus,
+input[type='datetime-local']:focus,
+input[type='email']:focus,
+input[type='month']:focus,
+input[type='number']:focus,
+input[type='password']:focus,
+input[type='search']:focus,
+input[type='tel']:focus,
+input[type='text']:focus,
+input[type='url']:focus,
+input[type='week']:focus,
+input:not([type]):focus,
+textarea:focus,
+select:focus {
+  border-color: var($--color-primary) !important;
+}
+
+select {
+  background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 8" width="30"><path fill="grey" d="M0,0l6,8l6-8"/></svg>') center right no-repeat !important;
+  padding-right: 3.0rem;
+}
+
+select:focus {
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 8" width="30"><path fill="grey" d="M0,0l6,8l6-8"/></svg>') !important;
+}
+
+// Dark
+@media (prefers-color-scheme: dark) { 
+  input[type='color'],
+  input[type='date'],
+  input[type='datetime'],
+  input[type='datetime-local'],
+  input[type='email'],
+  input[type='month'],
+  input[type='number'],
+  input[type='password'],
+  input[type='search'],
+  input[type='tel'],
+  input[type='text'],
+  input[type='url'],
+  input[type='week'],
+  input:not([type]),
+  textarea,
+  select {
+    color: var($--color-on-surface) !important;
+  }
+}
+
+
 /* buttons ---------------------------------------------------- */
 
 /* primary color */
-.button-primary {
-  background-color: $--color-primary;
-  border-color: $--color-primary;
-  color: $--color-on-primary;
+.button.button-primary {
+  background-color: var($--color-primary);
+  border-color: var($--color-primary);
+  color: var($--color-on-primary);
 }
-.button-primary.button-clear,
-.button-primary.button-outline {
+.button.button-primary:focus,
+.button.button-primary:active,
+.button.button-primary:visited,
+.button.button-primary:hover {
+  background-color: rgba(var($--color-primary-rgb), 0.9);
+  border-color: rgba(var($--color-primary-rgb), 0.9);
+}
+.button.button-primary.button-clear,
+.button.button-primary.button-outline {
   background-color: transparent;
-  color: $--color-primary;
+  color: var($--color-primary);
 }
-.button-primary.button-clear {
+.button.button-primary.button-clear {
   border-color: transparent;
 }
 
@@ -66,23 +126,7 @@
 
 /* pres ------------------------------------------------------- */
 
-/* primary color */
-.pre-primary {
-  background: transparent;
-  border-left-color: $--color-primary;
-  overflow-y: hidden;
-}
-
-/* secondary color */
-.pre-secondary {
-  background: transparent;
-  border-left-color: $--color-secondary;
-  overflow-y: hidden;
-}
-
-/* accent color */
-.pre-accent {
-  background: transparent;
-  border-left-color: $--color-accent;
-  overflow-y: hidden;
+.pre {
+  background: transparent !important;
+  border-left-color: $--color-primary !important;
 }

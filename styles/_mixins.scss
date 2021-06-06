@@ -1,5 +1,15 @@
-@mixin spread-map($map: ()) {
+// convert a hex value to comma-delimited rgb values
+// #000000 -> 0,0,0
+@function rgb-from-hex($hex) {
+  @return red($hex), green($hex), blue($hex);
+}
+
+// spread map of hex color values and generate two keys for every entry
+// first key contains the hex value of the color
+// second key (having rgb appended) contains the rgb value of the color
+@mixin spread-hex-color-map($map: ()) {
   @each $key, $value in $map {
       #{$key}: $value;
+      #{$key}-rgb: rgb-from-hex($value);
   }
 }

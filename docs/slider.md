@@ -59,4 +59,11 @@ export default class Slider extends LitElement {
     `;
   }
 }
+
+declare global {
+  interface HTMLElementTagNameMap {
+    'x-slider': Slider,
+  }
+}
+
 ```

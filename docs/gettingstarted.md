@@ -113,13 +113,13 @@ cat << "EOF" > ./src/styles/themes.scss
 // Light
 @media (prefers-color-scheme: light) {  
   :root {
-    @include spread-map($colors-light);
+    @include spread-hex-color-map($colors-light);
   }
 }
 // Dark
 @media (prefers-color-scheme: dark) { 
   :root {
-    @include spread-map($colors-dark);
+    @include spread-hex-color-map($colors-dark);
   }
 }
 
@@ -242,7 +242,6 @@ cat << EOF > src/components/app.ts
 import { css, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators';
 import store from '../store';
-import './slider';
 
 @customElement('x-app')
 export default class App extends LitElement {
@@ -284,6 +283,12 @@ export default class App extends LitElement {
         </div>
       </div>
     </div>`;
+  }
+}
+
+declare global {
+  interface HTMLElementTagNameMap {
+    'x-app': App,
   }
 }
 
@@ -407,8 +412,24 @@ curl https://cssicon.space/css/icons.css -o src/public/css/icons.css
 * add references in index.html
 * adjusts paths (in index.html and /public/fav/site.webmanifest)
 
-## compile sass to lit css
+## compile sass to lit css for the first time
 ```bash
 npm run build-css
 ```
 
+## create file to merge different lit-css files
+```bash
+cat << "EOF" > ./src/styles/styles.ts
+import milligramStyle from './milligram.min-css';
+import milliStyle from '../lib/styles/milli-css';
+import milliResponsive from '../lib/styles/milli-responsive-css';
+import customStyle from './custom-css';
+
+export default [
+  milligramStyle,
+  milliStyle,
+  milliResponsive,
+  customStyle,
+];
+
+EOF

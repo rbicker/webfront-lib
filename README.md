@@ -14,6 +14,7 @@ please note the undocumented classes, functions and components are currently a w
 * [state](./docs/state.md): small state machine which enables you to create a global application state
 * [router](./docs/router.md): tiny router which enables you to provide handlers for regex routes
 * [sass to lit-css script](./docs/sasstolit.md): generate lit css from (s)css files
+* [toast](./docs/toast.md): provide user feedback in a box
 * [slider](./docs/slider.md): create html elements that show their children in a loop
 
 ## some of my best practices, inspirations, helpful projects & links

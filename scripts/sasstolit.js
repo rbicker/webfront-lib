@@ -103,7 +103,7 @@ const sassRender = async () => {
   const sassFiles = await getSassFiles(opts.srcDir);
   const promises = sassFiles.map(async (f) => {
     const cssString = await sassToCss(f);
-    const newFileName = f.replace(/\.[^/.]+$/, '.css.ts');
+    const newFileName = f.replace(/\.[^/.]+$/, '-css.ts');
     const content = template.replace('{0}', cssString.trim());
     await writeFile(newFileName, content);
   });

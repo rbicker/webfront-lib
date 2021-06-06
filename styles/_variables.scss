@@ -1,5 +1,6 @@
 // assign css variables to scss variables
 
+// hex
 $--color-background: --color-background; /* main background color */
 $--color-on-background: --color-on-background; /* color for text on background */ 
 $--color-surface: --color-surface; /* surface (main container for example) */ 
@@ -16,3 +17,23 @@ $--color-warning: --color-warning; /* color for warning state */
 $--color-on-warning: --color-on-warning; /* color for text on warning state */
 $--color-error: --color-error; /* color for error state */
 $--color-on-error: --color-on-error; /* color for text on error state */
+
+// rgb
+$--color-background-rgb: --color-background-rgb; /* main background color */
+$--color-on-background-rgb: --color-on-background-rgb; /* color for text on background */ 
+$--color-surface-rgb: --color-surface-rgb; /* surface (main container for example) */ 
+$--color-on-surface-rgb: --color-on-surface-rgb; /* color for text on surface */
+$--color-primary-rgb: --color-primary-rgb; /* primary color for buttons, etc */
+$--color-on-primary-rgb: --color-on-primary-rgb; /* color for text on primary */ 
+$--color-secondary-rgb: --color-secondary-rgb; /* secondary color, a darker or lighter shape of the primary color */
+$--color-on-secondary-rgb: --color-on-secondary-rgb; /* color for text on secondary */ 
+$--color-accent-rgb: --color-accent-rgb; /* color to set accents, less than 10% of the web application */ 
+$--color-on-accent-rgb: --color-on-accent-rgb; /* color for text on accent */
+$--color-success-rgb: --color-success-rgb; /* color for success state */
+$--color-on-success-rgb: --color-on-success-rgb; /* color for text on success state */
+$--color-warning-rgb: --color-warning-rgb; /* color for warning state */
+$--color-on-warning-rgb: --color-on-warning-rgb; /* color for text on warning state */
+$--color-error-rgb: --color-error-rgb; /* color for error state */
+$--color-on-error-rgb: --color-on-error-rgb; /* color for text on error state */
+
+
