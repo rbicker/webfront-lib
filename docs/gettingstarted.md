@@ -51,8 +51,20 @@ EOF
 # scss file for custom styles
 cat << "EOF" > ./src/styles/custom.scss
 // custom
+@import '../lib/styles/variables';
+
 html, body {
   height: 100%;
+  margin: auto;
+}
+
+.wrapper .container {
+  max-width: 80rem;
+}
+
+body {
+  background-color: var($--color-background);
+  color: var($--color-on-background);
 }
 
 // ...
