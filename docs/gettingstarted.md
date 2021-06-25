@@ -331,6 +331,15 @@ document.addEventListener('click', router.getClickHandler);
 
 EOF
 
+# global.d.ts
+# index.ts
+cat << "EOF" > src/global.d.ts
+declare module '*.png'
+declare module '*.jpg'
+declare module '*.svg'
+
+EOF
+
 # Dockerfile
 cat << "EOF" > Dockerfile
 FROM node:alpine AS builder
