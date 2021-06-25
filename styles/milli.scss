@@ -1,6 +1,29 @@
 @import 'variables';
 @import 'mixins';
 
+/* links ------------------------------------------------------ */
+
+a, a.primary {
+  color: var($--color-primary);
+  &:focus, &:hover {
+    color: rgba(var($--color-primary-rgb), 0.8);
+  }
+}
+
+a.secondary {
+  color: var($--color-secondary);
+  &:focus, &:hover {
+    color: rgba(var($--color-secondary-rgb), 0.8);
+  }
+}
+
+a.accent {
+  color: var($--color-accent);
+  &:focus, &:hover {
+    color: rgba(var($--color-accent-rgb), 0.8);
+  }
+}
+
 /* inputs ----------------------------------------------------- */
 
 input[type='color']:focus,
@@ -66,8 +89,8 @@ select:focus {
 .button.button-primary:active,
 .button.button-primary:visited,
 .button.button-primary:hover {
-  background-color: rgba(var($--color-primary-rgb), 0.9);
-  border-color: rgba(var($--color-primary-rgb), 0.9);
+  background-color: rgba(var($--color-primary-rgb), 0.8);
+  border-color: rgba(var($--color-primary-rgb), 0.8);
 }
 .button.button-primary.button-clear,
 .button.button-primary.button-outline {
@@ -79,32 +102,46 @@ select:focus {
 }
 
 /* secondary color */
-.button-secondary {
-  background-color: $--color-secondary;
-  border-color: $--color-secondary;
-  color: $--color-on-secondary;
+.button.button-secondary {
+  background-color: var($--color-secondary);
+  border-color: var($--color-secondary);
+  color: var($--color-on-secondary);
 }
-.button-secondary.button-clear,
-.button-secondary.button-outline {
+.button.button-secondary:focus,
+.button.button-secondary:active,
+.button.button-secondary:visited,
+.button.button-secondary:hover {
+  background-color: rgba(var($--color-secondary-rgb), 0.8);
+  border-color: rgba(var($--color-secondary-rgb), 0.8);
+}
+.button.button-secondary.button-clear,
+.button.button-secondary.button-outline {
   background-color: transparent;
-  color: $--color-secondary;
+  color: var($--color-secondary);
 }
-.button-secondary.button-clear {
+.button.button-secondary.button-clear {
   border-color: transparent;
 }
 
 /* accent color */
-.button-accent {
-  background-color: $--color-accent;
-  border-color: $--color-accent;
-  color: $--color-on-accent;
+.button.button-accent {
+  background-color: var($--color-accent);
+  border-color: var($--color-accent);
+  color: var($--color-on-accent);
 }
-.button-accent.button-clear,
-.button-accent.button-outline {
+.button.button-accent:focus,
+.button.button-accent:active,
+.button.button-accent:visited,
+.button.button-accent:hover {
+  background-color: rgba(var($--color-accent-rgb), 0.8);
+  border-color: rgba(var($--color-accent-rgb), 0.8);
+}
+.button.button-accent.button-clear,
+.button.button-accent.button-outline {
   background-color: transparent;
-  color: $--color-accent;
+  color: var($--color-accent);
 }
-.button-accent.button-clear {
+.button.button-accent.button-clear {
   border-color: transparent;
 }
 

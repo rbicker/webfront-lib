@@ -1,0 +1,122 @@
+x-navbar {
+  display: block;
+}
+
+ul {
+  margin: 0px;
+  padding: 0px;
+}
+
+li {
+  list-style: none;
+}
+
+/* brand slots */
+::slotted([slot=brand]){
+  order: -10; /* show brand first */
+  display: inline !important; /* brand should always be displayed */ 
+  transform: none;
+}
+
+/* menu slots */
+::slotted(*){
+  display: none !important;
+}
+
+/* navbar */
+.bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center; /* flex-start; */
+  flex-wrap: wrap;
+  padding: 1rem;
+
+  /* hamburger menu is active: children */
+  &__toggle:checked ~ ::slotted(*) {
+    flex-basis: 100%;
+    display: flex !important;
+    flex-flow: column wrap;
+    align-items: center;
+    order: 20;
+  }
+
+  /* toggle */
+  &__toggle {
+    display: none; /* hide checkbox to toggle burger & menu */
+  }
+
+  /* hamburger */
+  &__burger {
+    cursor: pointer; /* show mouse pointer hamburger */
+    order: 10;
+
+    /* slices */
+    span {
+      letter-spacing: 0px;
+      display: block;
+      opacity: 1;
+      transform: none;
+      width: 28px;
+      height: 3px;
+      margin-bottom: 5px;
+      position: relative;
+      background: var(--color-navbar-burger, var(--color-primary, black));
+      border-radius: 3px;
+      
+      transition: transform 0.5s cubic-bezier(0.77,0.2,0.05,1.0),
+                  background-color 0.5s cubic-bezier(0.77,0.2,0.05,1.0),
+                  opacity 0.5s ease;  
+    }
+
+    /* first slice */
+    span:first-child {
+      transform-origin: top right; /* start rotation on top right */ 
+    }
+
+    /* last slice */
+    span:last-child {
+      transform-origin: bottom right; /* start rotation on bottom right */
+    }
+  }
+  
+  /* x (close button version of hamburger): slices */
+  &__toggle:checked + &__burger span {
+    background-color: var(--color-navbar-x, var(--color-secondary, black));
+  }
+
+  /* x: turn the first slice */
+  &__toggle:checked + &__burger span:first-child {
+    transform: rotate(-45deg);
+  }
+    
+  /* x: turn the last slice */
+  &__toggle:checked + &__burger span:last-child {
+    transform: rotate(45deg) translate(2px, 2px);
+  }
+    
+  /* x: hide the middle slice */
+  &__toggle:checked + &__burger span:nth-last-child(2) {
+    opacity: 0;
+    transform: rotate(0deg) scale(0.2, 0.2);
+  }
+}
+
+/* desktop view: larger than mobile screen */
+@media (min-width: 40.0rem) {
+
+  li {
+    display: inline;
+  }
+  
+  .bar {
+    &__burger {
+      /* no hamburger menu on desktop */
+      display: none;
+    }
+  }
+  /* menu slots */
+  .bar__toggle:checked ~ ::slotted(*), ::slotted(*){
+    display: inline !important;
+    flex-basis: auto;
+  }
+}
