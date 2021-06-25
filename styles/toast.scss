@@ -34,7 +34,7 @@
 .toast__close {
   cursor: pointer;
   position: absolute;
-  color: var(--color-on-surface-toast, var($--color-primary, blue));
+  color: var(--color-on-surface-toast, var($--color-on-primary, blue));
   right: 1rem;
   top: 1rem;
 }

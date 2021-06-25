@@ -108,6 +108,7 @@ export default class ToastContainer extends LitElement {
         // remove toast
         toasts.splice(index, 1);
         this.toasts = [...toasts];
+        this.paused = false;
         return;
       }
       index -= 1;
