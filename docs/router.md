@@ -26,5 +26,8 @@ router.addRoute(/^\/hello\/(?<name>.*)/, async (next, groups) => {
 router.handlePath(window.location.pathname);
 
 // add click handler
-document.addEventListener('click', router.getClickHandler);
+document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('click', router.getClickHandler());
+});
+
 ```

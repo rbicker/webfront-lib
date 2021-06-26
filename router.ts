@@ -90,20 +90,20 @@ export default class Router {
   getClickHandler(): (event : MouseEvent) => void {
     const self = this;
     return (event : MouseEvent) => {
-      const target = event.target as HTMLElement;
-      const elem = target.closest('a');
+      const elem = event.composedPath()[0] as Element;
       if (!elem) {
         // do not handle if not a link
         return;
       }
       // only handle internal paths
-      const href = target.getAttribute('href');
+      const href = elem.getAttribute('href');
       if (!href || href.length === 0 || href.charAt(0) !== '/') {
         return;
       }
       // stop the browser from navigating to the destination url
       event.preventDefault();
       // handle path
+      logger.debug('router is handling click event');
       self.handlePath(href);
     };
   }
