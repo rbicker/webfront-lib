@@ -195,7 +195,14 @@ EOF
 
 cat << EOF > .babelrc
 {
-	"presets": ["@parcel/babel-preset-env", "@babel/preset-typescript"],
+	"presets": [
+		["@parcel/babel-preset-env", {
+      "targets": {
+        "browsers": ["last 2 Chrome versions"]
+      }
+    }],
+		"@babel/preset-typescript"
+	],
 	"plugins": [
 		["@babel/plugin-proposal-class-properties"],
 		["@babel/plugin-proposal-decorators", { "decoratorsBeforeExport" : true}]
