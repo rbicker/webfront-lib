@@ -1,5 +1,5 @@
 # router
-Router implements a router to match paths against (regexp) routes. If a route matches, a callback function is being run which has access to the named regexp groups. Callback functions can be async. The callback function(s) should run the next() function to proceed with the next handler.
+Router implements a router to match full paths against (regexp) routes. If a route matches, a callback function is being run which has access to the named regexp groups and the full path. Callback functions can be async. The callback function(s) should run the next() function to proceed with the next handler.
 
 For SEO it is important to use "normal links" in your web application. This is why the router provides a click handler to attach to "document". It acts whenever an internal link / a-Element is being clicked.
 
@@ -22,8 +22,8 @@ router.addRoute(/^\/hello\/(?<name>.*)/, async (next, groups) => {
   next();
 });
 
-// handle current path
-router.handlePath(window.location.pathname);
+// handle current location's href
+router.handleHref(window.location.href);
 
 // add click handler
 document.addEventListener('DOMContentLoaded', () => {
