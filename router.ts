@@ -9,7 +9,7 @@ import logger from './logger';
 export default class Router {
   routes: {
     re: RegExp,
-    cb: (next: () => void, groups: {[key: string]: string}|undefined) => void | Promise<void>
+    cb: (next: () => void, groups: {[key: string]: string}) => void | Promise<void>
   }[] = [];
 
   defaultRoute: ((path : string) => void) | undefined = undefined
@@ -23,7 +23,7 @@ export default class Router {
   addRoute(re: RegExp,
     cb: (
       next: () => void,
-      groups: {[key: string]: string}|undefined) => void) {
+      groups: {[key: string]: string}) => void) {
     logger.debug(`added route ${re}`);
     this.routes.push({
       re,
@@ -42,15 +42,16 @@ export default class Router {
     logger.debug(`router is handling path "${p}"`);
 
     const matches : {
-      cb: (next: () => void, groups: {[key: string]: string}|undefined) => void
-      groups: {[key: string]: string}|undefined
+      cb: (next: () => void, groups: {[key: string]: string}) => void
+      groups: {[key: string]: string}
     }[] = [];
 
     this.routes.forEach((route) => {
       const match = p.match(route.re);
       if (match) {
         logger.debug(`path "${p}" matched route ${route.re}`);
-        matches.push({ cb: route.cb, groups: match.groups });
+        const groups = match.groups || {};
+        matches.push({ cb: route.cb, groups });
       }
     });
     if (matches.length > 0) {
@@ -70,8 +71,8 @@ export default class Router {
    * @returns void
    */
   private runCallback(matches : {
-    cb: (next: () => void, groups: {[key: string]: string}|undefined) => void,
-    groups: {[key: string]: string}|undefined
+    cb: (next: () => void, groups: {[key: string]: string}) => void,
+    groups: {[key: string]: string}
   }[], index : number) {
     if (index >= matches.length) {
       return;
