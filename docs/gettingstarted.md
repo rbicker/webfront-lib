@@ -144,7 +144,7 @@ npm init
 npm install --save lit
 
 # dev dependencies
-npm install --save-dev typescript @types/node sass cross-env parcel@next @mischnic/parcel-resolver-root @babel/plugin-proposal-decorators @parcel/babel-preset-env @babel/preset-typescript
+npm install --save-dev typescript @types/node sass cross-env parcel@next @babel/plugin-proposal-decorators @parcel/babel-preset-env @babel/preset-typescript
 
 # eslint
 npm install --save-dev eslint
@@ -185,14 +185,7 @@ cat << EOF > tsconfig.json
 }
 EOF
 
-# parcel config
-cat << EOF > .parcelrc
-{
-	"extends": "@parcel/config-default",
-	"resolvers": ["@mischnic/parcel-resolver-root", "..."]
-}
-EOF
-
+# babel config
 cat << EOF > .babelrc
 {
 	"presets": [
@@ -218,13 +211,13 @@ cat << EOF > src/index.html
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
-    <link rel="stylesheet" href="/styles/themes.scss">
-    <link rel="stylesheet" href="/styles/custom.scss">
+    <link rel="stylesheet" href="/src/styles/themes.scss">
+    <link rel="stylesheet" href="/src/styles/custom.scss">
     <title>Hello</title>
   </head>
   <body>
     <x-app></x-app>
-    <script src="/index.ts"></script>
+    <script src="/src/index.ts"></script>
   </body>
 </html>
 
