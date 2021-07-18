@@ -5,14 +5,16 @@ enum LogLevel {
   INFO = 2,
   WARN = 3,
   ERROR = 4,
-  SILENT = 5,
 }
 
 // logger
 class Logger {
+  enabled : boolean;
+
   logLevel : LogLevel;
 
   constructor() {
+    this.enabled = process.env.NODE_ENV === 'development' || localStorage.getItem('logEnabled') === '1';
     const level = localStorage.getItem('loglevel');
     this.logLevel = LogLevel.INFO;
     if (level) {
@@ -23,6 +25,16 @@ class Logger {
         this.error(`invalid loglevel in localStorage: ${l}`);
       }
     }
+  }
+
+  // enable logger
+  enable(){
+    this.enabled = true;
+  }
+
+  // disable logger
+  disabled(){
+    this.enabled = false;
   }
 
   // set log level
@@ -63,7 +75,7 @@ class Logger {
 
   // log on given level
   log(level : LogLevel, ...message : any[]) {
-    if (process.env.NODE_ENV === 'development' && level >= this.logLevel) {
+    if (this.enabled && level >= this.logLevel) {
       // eslint-disable-next-line no-console
       console.log(`${LogLevel[level]}: ${message}`);
     }

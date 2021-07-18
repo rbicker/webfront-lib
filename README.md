@@ -10,7 +10,8 @@ Starting from version 2, this library and my approach loosely depends on the awe
 
 please note the undocumented classes, functions and components are currently a work in progress and might not work. Updates and more documentations are coming soon.
 
-* [starting a new project](./docs/gettingstarted.md): instructions on how to create a new project 
+* [starting a new project](./docs/gettingstarted.md): instructions on how to create a new project
+* [logger](./docs/logger.md): simple logger to log messages with different log levels to console
 * [state](./docs/state.md): small state machine which enables you to create a global application state
 * [router](./docs/router.md): tiny router which enables you to provide handlers for regex routes
 * [sass to lit-css script](./docs/sasstolit.md): generate lit css from (s)css files
