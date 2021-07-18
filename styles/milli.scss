@@ -167,3 +167,23 @@ select:focus {
   background: transparent !important;
   border-left-color: $--color-primary !important;
 }
+
+/* divs ------------------------------------------------------- */
+
+.div.primary {
+  background-color: var($--color-primary);
+  border: 0.1rem solid rgba(var($--color-primary-rgb), 0.8);
+  color: var($--color-on-primary);
+}
+
+.div.secondary {
+  background-color: var($--color-secondary);
+  border: 0.1rem solid rgba(var($--color-secondary-rgb), 0.8);
+  color: var($--color-on-secondary);
+}
+
+.div.accent {
+  background-color: var($--color-accent);
+  border: 0.1rem solid rgba(var($--color-accent-rgb), 0.8);
+  color: var($--color-on-accent);
+}
