@@ -14,7 +14,7 @@ class Logger {
   logLevel : LogLevel;
 
   constructor() {
-    this.enabled = process.env.NODE_ENV === 'development' || localStorage.getItem('logEnabled') === '1';
+    this.enabled = process.env.NODE_ENV === 'development' || localStorage.getItem('logger') === '1';
     const level = localStorage.getItem('loglevel');
     this.logLevel = LogLevel.INFO;
     if (level) {
@@ -40,7 +40,7 @@ class Logger {
   // set log level
   setLogLevel(level : LogLevel) {
     this.logLevel = level;
-    localStorage.setItem('debuglevel', level.toString());
+    localStorage.setItem('loglevel', level.toString());
   }
 
   // get log level

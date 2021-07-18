@@ -15,10 +15,10 @@
 configuration is being done using localstorage.
 ```javascript
 // manually enable logger
-localStorage.setItem("logEnabled", 1);
+localStorage.setItem("logger", 1);
 
 // set log level (to error only)
-localStorage.setItem("logLevel", 4);
+localStorage.setItem("loglevel", 4);
 ```
 
 ## log messages
