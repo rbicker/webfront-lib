@@ -146,19 +146,6 @@ npm install --save lit
 # dev dependencies
 npm install --save-dev typescript @types/node sass cross-env parcel@next @babel/plugin-proposal-decorators @parcel/babel-preset-env @babel/preset-typescript
 
-# eslint
-npm install --save-dev eslint
-npx eslint --init
-How would you like to use ESLint? · syntax, problems, style
-What type of modules does your project use? · javascript modules
-Which framework does your project use? · none
-Does your project use TypeScript? · Yes
-Where does your code run? · browser
-How would you like to define a style for your project? · guide
-Which style guide do you want to follow? · airbnb
-What format do you want your config file to be in? · JavaScript
-Install Dependencies
-
 # typescript
 npm install -g typescript
 tsc --init
@@ -183,6 +170,22 @@ cat << EOF > tsconfig.json
       "src/**/*"
   ]
 }
+EOF
+
+# eslint typescript airbnb (https://www.npmjs.com/package/eslint-config-airbnb-typescript)
+npm install --save-dev eslint-plugin-import@^2.22.0 @typescript-eslint/eslint-plugin@^4.4.1
+cat << EOF > .eslint.js
+module.exports = {
+  extends: [
+    'airbnb-typescript/base',
+  ],
+  parserOptions: {
+    project: './tsconfig.json',
+  },
+  ignorePatterns: ['.eslintrc.js', '/build/**/*'],
+  rules: {
+  },
+};
 EOF
 
 # babel config
