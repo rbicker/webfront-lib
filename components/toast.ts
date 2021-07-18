@@ -12,7 +12,7 @@ type Toast = {
   type : string
   total : number
   remaining : number
-}
+};
 
 @customElement('x-toast-container')
 export default class ToastContainer extends LitElement {
@@ -56,7 +56,7 @@ export default class ToastContainer extends LitElement {
     };
     this.toasts = [...this.toasts, t];
     this.run();
-  }
+  };
 
   private run() {
     if (this.timerId > 0 || this.paused) {
@@ -93,12 +93,12 @@ export default class ToastContainer extends LitElement {
       window.clearTimeout(this.timerId);
       this.timerId = -1;
     }
-  }
+  };
 
   private resume = () => {
     this.paused = false;
     this.run();
-  }
+  };
 
   private close = (id : number) => {
     const toasts = [...this.toasts];
@@ -113,7 +113,7 @@ export default class ToastContainer extends LitElement {
       }
       index -= 1;
     }
-  }
+  };
 
   render() {
     return html`

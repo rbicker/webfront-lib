@@ -13,12 +13,12 @@ export default class Router {
     re: RegExp,
     cb: (
       next: () => void,
-      groups: {[key: string]: string},
+      groups: { [key: string]: string },
       fullPath : string
     ) => void | Promise<void>
   }[] = [];
 
-  defaultRoute: ((fullPath : string) => void) | undefined = undefined
+  defaultRoute: ((fullPath : string) => void) | undefined = undefined;
 
   /**
    * add a route (regexp) and a callback function.
@@ -29,9 +29,9 @@ export default class Router {
   addRoute(re: RegExp,
     cb: (
       next: () => void,
-      groups: {[key: string]: string},
+      groups: { [key: string]: string },
       fullPath : string,
-      ) => void) {
+    ) => void) {
     logger.debug(`added route ${re}`);
     this.routes.push({
       re,
@@ -51,8 +51,8 @@ export default class Router {
     logger.debug(`router is handling path "${path}"`);
 
     const matches : {
-      cb: (next: () => void, groups: {[key: string]: string}, fullPath : string) => void
-      groups: {[key: string]: string},
+      cb: (next: () => void, groups: { [key: string]: string }, fullPath : string) => void
+      groups: { [key: string]: string },
       fullPath : string
     }[] = [];
 
@@ -81,8 +81,8 @@ export default class Router {
    * @returns void
    */
   private runCallback(matches : {
-    cb: (next: () => void, groups: {[key: string]: string}, fullPath : string) => void,
-    groups: {[key: string]: string},
+    cb: (next: () => void, groups: { [key: string]: string }, fullPath : string) => void,
+    groups: { [key: string]: string },
     fullPath: string,
   }[], index : number) {
     if (index >= matches.length) {

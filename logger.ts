@@ -28,12 +28,12 @@ class Logger {
   }
 
   // enable logger
-  enable(){
+  enable() {
     this.enabled = true;
   }
 
   // disable logger
-  disabled(){
+  disabled() {
     this.enabled = false;
   }
 

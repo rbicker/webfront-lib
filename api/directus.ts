@@ -1,37 +1,37 @@
 import logger from '../logger';
 
 type DirectusGlobalQuery = {
-  fields : string[]|undefined
-  filter: string|{ [key : string]: any}|undefined
-  deep : string|{ [key : string]: any}|undefined
+  fields : string[] | undefined
+  filter: string | { [key : string]: any } | undefined
+  deep : string | { [key : string]: any } | undefined
 };
 
 // Directus is a helper class for api interactions with
 // the directus data platform.
 class Directus {
   // singleton
-  static instance : Directus
+  static instance : Directus;
 
   // baseurl to use for all queries
-  baseUrl : string = ''
+  baseUrl : string = '';
 
   // locale to use for queries
-  locale : string = ''
+  locale : string = '';
 
   // default locale is the locale assumed for content
   // that is not nested in the translations relation
-  defaultLocale : string = 'en'
+  defaultLocale : string = 'en';
 
   // the field name used on the parent collection as
   // an alias for the relation to the translations
-  parentTranslationsFieldName : string = 'translations'
+  parentTranslationsFieldName : string = 'translations';
 
   // the field name used on the translation / child collection
   // containing the language code
-  translationLanguageFieldName : string = 'languages_code'
+  translationLanguageFieldName : string = 'languages_code';
 
   // determines if translations should be merged for all items
-  mergeAllTranslations : boolean = true
+  mergeAllTranslations : boolean = true;
 
   constructor() {
     // singleton
@@ -124,7 +124,7 @@ class Directus {
    */
   async getItems(collection : string,
     query? : DirectusGlobalQuery)
-    : Promise<{ [key: string]: any }|[{ [key: string]: any }]> {
+    : Promise<{ [key: string]: any } | [{ [key: string]: any }]> {
     const l = this.locale || this.defaultLocale;
     const q : DirectusGlobalQuery = query || {
       filter: undefined,
@@ -169,7 +169,7 @@ class Directus {
     if (!response.ok) {
       throw Error(response.statusText);
     }
-    const data = (await response.json()).data;
+    const { data } = await response.json();
 
     if (!this.mergeAllTranslations) {
       return data;
