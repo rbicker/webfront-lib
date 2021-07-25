@@ -45,7 +45,7 @@ export default class Router {
    * callback functions are being called.
    * @param href the href to handle
    */
-  handleHref(href : string) {
+  handleHref(href : string, historyAction : 'push' | 'replace' | 'none' = 'push') {
     const replace = `^${window.location.origin}`;
     const path = href.replace(new RegExp(replace), '').toLowerCase();
     logger.debug(`router is handling path "${path}"`);
@@ -70,7 +70,16 @@ export default class Router {
       logger.debug(`running default route for path "${path}"`);
       this.defaultRoute(path);
     }
-    window.history.pushState({}, (window as any).title || path, path);
+    switch (historyAction) {
+      case 'push':
+        window.history.pushState({}, (window as any).title || path, path);
+        break;
+      case 'replace':
+        window.history.replaceState({}, (window as any).title || path, path);
+        break;
+      default:
+        // none
+    }
   }
 
   /**

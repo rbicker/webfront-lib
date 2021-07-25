@@ -25,9 +25,15 @@ router.addRoute(/^\/hello\/(?<name>.*)/, async (next, groups) => {
 // handle current location's href
 router.handleHref(window.location.href);
 
-// add click handler
+// add routing event listeners
 document.addEventListener('DOMContentLoaded', () => {
+  // on clicks, handle links
   document.addEventListener('click', router.getClickHandler());
+});
+window.addEventListener('popstate', () => {
+  logger.debug(`handling popstate for ${window.location.href}`);
+  // handle browser "back" button
+  router.handleHref(window.location.href, 'none');
 });
 
 ```
