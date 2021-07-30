@@ -123,13 +123,13 @@ cat << "EOF" > ./src/styles/themes.scss
 @import '../lib/styles/mixins';
 
 // Light
-@media (prefers-color-scheme: light) {  
+@media (prefers-color-scheme: light) {
   :root {
     @include spread-hex-color-map($colors-light);
   }
 }
 // Dark
-@media (prefers-color-scheme: dark) { 
+@media (prefers-color-scheme: dark) {
   :root {
     @include spread-hex-color-map($colors-dark);
   }
@@ -253,7 +253,7 @@ export {
 EOF
 
 # app.ts
-cat << EOF > src/components/app.ts
+cat << "EOF" > src/components/app.ts
 import { css, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators';
 import store from '../store';
