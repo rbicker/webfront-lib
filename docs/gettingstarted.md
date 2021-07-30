@@ -7,22 +7,24 @@ mkdir -p src/api src/components src/styles src/assets/fav src/assets/img build
 
 # init git
 git init
-cat << EOF > .gitignore
+cat << "EOF" > .gitignore
 .DS_Store
 *.css.ts
 node_modules/
 build/
 .parcel-cache/
 .env*.local
+
 EOF
 
 # add readme
-cat << EOF > README.md
+cat << "EOF" > README.md
 # README
+
 EOF
 
 # add changelog
-cat << EOF > CHANGELOG.md
+cat << "EOF" > CHANGELOG.md
 # Changelog
 All notable changes to this project will be documented in this file.
 
@@ -34,10 +36,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.0.1] - $(date +"%F")
 ### Added
 * project structure
+
 EOF
 
 # add MIT license
-cat << EOF > LICENSE
+cat << "EOF" > LICENSE
 Copyright $(date +"%Y") $(whoami)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
@@ -45,6 +48,7 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 EOF
 
 # styles
@@ -154,7 +158,7 @@ tsc --init
 git submodule add https://github.com/rbicker/webfront-lib src/lib
 
 # tsconfig.json
-cat << EOF > tsconfig.json
+cat << "EOF" > tsconfig.json
 {
   "compilerOptions": {
     "target": "es5",                          /* Specify ECMAScript target version: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017', 'ES2018', 'ES2019' or 'ESNEXT'. */
@@ -170,11 +174,12 @@ cat << EOF > tsconfig.json
       "src/**/*"
   ]
 }
+
 EOF
 
 # eslint typescript airbnb (https://www.npmjs.com/package/eslint-config-airbnb-typescript)
 npm install --save-dev eslint-plugin-import@^2.22.0 @typescript-eslint/eslint-plugin@^4.4.1
-cat << EOF > .eslint.js
+cat << "EOF" > .eslint.js
 module.exports = {
   extends: [
     'airbnb-typescript/base',
@@ -186,10 +191,11 @@ module.exports = {
   rules: {
   },
 };
+
 EOF
 
 # babel config
-cat << EOF > .babelrc
+cat << "EOF" > .babelrc
 {
 	"presets": [
 		["@parcel/babel-preset-env", {
@@ -204,10 +210,11 @@ cat << EOF > .babelrc
 		["@babel/plugin-proposal-decorators", { "decoratorsBeforeExport" : true}]
 	]
 }
+
 EOF
 
 # index.html
-cat << EOF > src/index.html
+cat << "EOF" > src/index.html
 <!doctype html>
 <html lang="en">
   <head>
@@ -227,7 +234,7 @@ cat << EOF > src/index.html
 EOF
 
 # store.js
-cat << EOF > src/store.ts
+cat << "EOF" > src/store.ts
 import ApplicationStore, { Store } from './lib/store';
 
 type AppState = {
@@ -250,6 +257,7 @@ export {
   AppState,
   resetStore,
 };
+
 EOF
 
 # app.ts
@@ -310,10 +318,11 @@ declare global {
 EOF
 
 # index.ts
-cat << EOF > src/index.ts
+cat << "EOF" > src/index.ts
 import store from './store';
 import Router from './lib/router';
 import './components/app';
+import logger from './lib/logger';
 
 // routing
 const router = new Router();
@@ -328,9 +337,19 @@ router.addRoute(/^\/(?<name>.*)/, (next, groups) => {
   next();
 });
 
-router.handlePath(window.location.pathname);
+// handle current location's href
+router.handleHref(window.location.href);
 
-document.addEventListener('click', router.getClickHandler);
+// add routing event listeners
+document.addEventListener('DOMContentLoaded', () => {
+  // on clicks, handle links
+  document.addEventListener('click', router.getClickHandler());
+});
+window.addEventListener('popstate', () => {
+  logger.debug(`handling popstate for ${window.location.href}`);
+  // handle browser "back" button
+  router.handleHref(window.location.href, 'none');
+});
 
 EOF
 
@@ -368,6 +387,7 @@ server {\n\
 > /etc/nginx/conf.d/default.conf
 RUN rm -rf /usr/share/nginx/html/*
 COPY --from=builder /usr/local/src/site/build/release/ /usr/share/nginx/html
+
 EOF
 ```
 
@@ -381,46 +401,11 @@ EOF
     "dev": "npx cross-env parcel serve ./src/index.html --dist-dir build/debug",
     "build": "npx cross-env NODE_ENV=production parcel build src/index.html --dist-dir build/release"
   },
+  // not needed anymore?
 	"@mischnic/parcel-resolver-root": {
 		"/": "./src"
 	},
   // ...
-```
-
-### .eslintrc.js
-```javascript
-module.exports = {
-  // ...
-  rules: {
-    '@typescript-eslint/explicit-module-boundary-types': 'off',
-    '@typescript-eslint/no-explicit-any': 'off',
-    'no-unused-vars': 'off',
-    '@typescript-eslint/no-unused-vars': ['error'],
-    'import/extensions': [
-      'error',
-      'ignorePackages',
-      {
-        js: 'never',
-        jsx: 'never',
-        ts: 'never',
-        tsx: 'never',
-      },
-    ],
-    'import/no-unresolved': [
-      2,
-      { ignore: ['^url:'] },
-    ],
-  },
-  settings: {
-    'import/resolver': {
-      node: {
-        paths: ['src'],
-        extensions: ['.js', '.jsx', '.ts', '.jsx'],
-      },
-    },
-  },
-};
-
 ```
 
 ## milligram css
