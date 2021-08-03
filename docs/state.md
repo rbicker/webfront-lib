@@ -17,11 +17,11 @@ const initialState : AppState = {
   name: 'World',
 };
 
-// save initial state, with persist set to true
-export default new ApplicationStore(initialState, false);
+// save initial state, with presistance set to false
+export default new ApplicationStore<AppState>(initialState, false);
 
 // method to reset state
-const resetStore = (store: Store) : void => {
+const resetStore = (store: Store<AppState>) : void => {
   store.resetState('reset');
 };
 
@@ -41,7 +41,7 @@ store.set('name', name);
 // ...
 ```
 
-The library's application store emits custom events whenever the application state changes. 
+The library's application store emits custom events whenever the application state changes.
 This enables you to create event listeners for these events.
 The events are prefixed by "appstate:" by default.
 One common use case is to bind a local property from a LitElement to the application store. This way, the LitElement re-renders whenever the state changes.

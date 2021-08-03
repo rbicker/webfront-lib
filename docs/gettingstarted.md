@@ -245,11 +245,11 @@ const initialState : AppState = {
   name: 'World',
 };
 
-// save initial state, with persist set to true
-export default new ApplicationStore(initialState, false);
+// save initial state, with presistance set to false
+export default new ApplicationStore<AppState>(initialState, false);
 
 // method to reset state
-const resetStore = (store: Store) : void => {
+const resetStore = (store: Store<AppState>) : void => {
   store.resetState('reset');
 };
 

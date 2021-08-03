@@ -1,19 +1,19 @@
 import logger from './logger';
 
 // Store describes an interace that can be used to save a state.
-interface Store{
+interface Store<StateType>{
   set: (propertyString: string, value: any)=>void;
   resetState:(event : string) => void;
-  readonly state: { [key: string]: any };
+  readonly state: StateType;
 }
 
 // ApplicationStore is the implementation of store to save  an application state.
-export default class ApplicationStore implements Store {
+export default class ApplicationStore<StateType> implements Store<StateType> {
   events: { [key: string]: ((data: any) => void)[] };
 
-  initialState: { [key: string]: unknown };
+  initialState: StateType;
 
-  state: { [key: string]: unknown };
+  state: StateType;
 
   name : string;
 
@@ -26,10 +26,10 @@ export default class ApplicationStore implements Store {
    * @param initialState the initial state of the store
    * @param persist persist store to local storage
    */
-  constructor(initialState: Record<string, unknown> | undefined, persist? : boolean) {
+  constructor(initialState: StateType, persist? : boolean) {
     this.events = {};
-    this.initialState = initialState || {};
-    this.state = initialState || {};
+    this.initialState = initialState;
+    this.state = initialState;
     this.name = 'appstate';
     this.context = window;
     this.persist = persist || false;
