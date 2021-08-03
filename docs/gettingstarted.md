@@ -178,8 +178,8 @@ cat << "EOF" > tsconfig.json
 EOF
 
 # eslint typescript airbnb (https://www.npmjs.com/package/eslint-config-airbnb-typescript)
-npm install --save-dev eslint-plugin-import@^2.22.0 @typescript-eslint/eslint-plugin@^4.4.1
-cat << "EOF" > .eslint.js
+npm install --save-dev eslint eslint-config-airbnb-typescript eslint-plugin-import@^2.22.0 @typescript-eslint/eslint-plugin@^4.4.1
+cat << "EOF" > .eslintrc.js
 module.exports = {
   extends: [
     'airbnb-typescript/base',
