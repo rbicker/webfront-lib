@@ -1,9 +1,10 @@
 @import './variables';
 
 :host {
-  position: absolute;
+  position: fixed;
   right: 0;
   direction: rtl;
+  z-index: 9999;
 }
 .toast {
   direction: ltr;
