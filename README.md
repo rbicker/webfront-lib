@@ -18,6 +18,7 @@ please note the undocumented classes, functions and components are currently a w
 * [navbar](./docs/navbar.md): flexible mobile-first navbar
 * [toast](./docs/toast.md): provide user feedback in a box
 * [slider](./docs/slider.md): create html elements that show their children in a loop
+* [directus](./docs/directus.md): directus headless cms
 
 ## some of my best practices, inspirations, helpful projects & links
 * use parcel as bundler (https://parceljs.org/)

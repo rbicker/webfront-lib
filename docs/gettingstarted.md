@@ -3,7 +3,7 @@
 ## init folder & files
 ```bash
 # create directories & files
-mkdir -p src/api src/components src/styles src/assets/fav src/assets/img build
+mkdir -p src/api src/components src/styles src/assets/fav src/assets/img src/static build
 
 # init git
 git init
@@ -148,7 +148,7 @@ npm init
 npm install --save lit
 
 # dev dependencies
-npm install --save-dev typescript @types/node sass cross-env parcel@next @babel/plugin-proposal-decorators @parcel/babel-preset-env @babel/preset-typescript
+npm install --save-dev typescript @types/node sass brotli cross-env parcel@next parcel-reporter-static-files-copy parcel-plugin-compress @babel/plugin-proposal-decorators @parcel/babel-preset-env @babel/preset-typescript
 
 # typescript
 npm install -g typescript
@@ -376,6 +376,7 @@ server {\n\
     root /usr/share/nginx/html;\n\
     index index.html;\n\
     server_name _;\n\
+    gzip_static on;\n\
     location /not-found {\n\
         return 404;\n\
     }\n\
@@ -389,22 +390,32 @@ RUN rm -rf /usr/share/nginx/html/*
 COPY --from=builder /usr/local/src/site/build/release/ /usr/share/nginx/html
 
 EOF
+
+# parcelrc configuration
+cat << "EOF" > .parcelrc
+{
+  "extends": ["@parcel/config-default"],
+  "reporters":  ["...", "parcel-reporter-static-files-copy"]
+}
+
+EOF
+
+# robots.txt
+touch ./src/static/robots.txt
 ```
 
 ## adjust configurations
 ### package.json
 ```json
   // ...
-  // add scripts
   "scripts": {
     "build-css": "npx cross-env node src/lib/scripts/sasstolit.js",
     "dev": "npx cross-env parcel serve ./src/index.html --dist-dir build/debug",
     "build": "npx cross-env NODE_ENV=production parcel build src/index.html --dist-dir build/release"
   },
-  // not needed anymore?
-	"@mischnic/parcel-resolver-root": {
-		"/": "./src"
-	},
+  "staticFiles": {
+    "staticPath": "src/static"
+  },
   // ...
 ```
 

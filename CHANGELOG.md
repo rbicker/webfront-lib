@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.4.0] - 2021-08-19
+### Added
+* static robots.txt
+* gzip compression for better performance
+* directus multilanguage helper
+* function to set meta description
+
 ## [2.3.0] - 2021-08-03
 ### Changed
 * store takes a Type parameter to describe the state

@@ -1,26 +1,55 @@
 import logger from '../logger';
 
-type DirectusGlobalQuery = {
-  fields : string[] | undefined
-  filter: string | { [key : string]: any } | undefined
-  deep : string | { [key : string]: any } | undefined
+/**
+ * directus type definitions: begin
+ * (copied from directus sdk - items.d.ts)
+ */
+type ItemMetadata = {
+  total_count?: number;
+  filter_count?: number;
 };
+type QueryOne<T> = {
+  fields?: keyof T | (keyof T)[] | '*' | '*.*' | '*.*.*' | string | string[];
+  search?: string;
+  deep?: Record<string, QueryMany<T>>;
+  export?: 'json' | 'csv' | 'xml';
+  filter?: Filter<T>;
+};
+type QueryMany<T> = QueryOne<T> & {
+  sort?: Sort<T>;
+  limit?: number;
+  offset?: number;
+  page?: number;
+  meta?: keyof ItemMetadata | '*';
+};
+type Sort<T> = (`${Extract<keyof T, string>}` | `-${Extract<keyof T, string>}`)[];
+type FilterOperators = '_eq' | '_neq' | '_contains' | '_ncontains' | '_in' | '_nin' | '_gt' | '_gte' | '_lt' | '_lte' | '_null' | '_nnull' | '_empty' | '_nempty';
+type FilterOperator<T, K extends keyof T> = {
+  [O in FilterOperators]?: Filter<T> | T[K];
+};
+type Filter<T> = {
+  [K in keyof T]?:
+  FilterOperator<T, K> | string | boolean | number | string[] | Record<string, any>;
+};
+/**
+ * directus type definitions: end
+ */
 
-// Directus is a helper class for api interactions with
-// the directus data platform.
-class Directus {
+/**
+ * Directus is a helper class for handling multilingual
+ * directus data
+ */
+class MultiLanguageDirectus {
   // singleton
-  static instance : Directus;
-
-  // baseurl to use for all queries
-  baseUrl : string = '';
-
-  // locale to use for queries
-  locale : string = '';
+  static instance : MultiLanguageDirectus;
 
   // default locale is the locale assumed for content
   // that is not nested in the translations relation
   defaultLocale : string = 'en';
+
+  // locale is the current locale for querying
+  // items
+  locale : string = 'en';
 
   // the field name used on the parent collection as
   // an alias for the relation to the translations
@@ -30,23 +59,12 @@ class Directus {
   // containing the language code
   translationLanguageFieldName : string = 'languages_code';
 
-  // determines if translations should be merged for all items
-  mergeAllTranslations : boolean = true;
-
   constructor() {
     // singleton
-    if (!Directus.instance) {
-      Directus.instance = this;
+    if (!MultiLanguageDirectus.instance) {
+      MultiLanguageDirectus.instance = this;
     }
-    return Directus.instance;
-  }
-
-  /**
-   * set directus base url
-   * @param url base url
-   */
-  setBaseUrl(url : string) {
-    this.baseUrl = url;
+    return MultiLanguageDirectus.instance;
   }
 
   /**
@@ -59,42 +77,73 @@ class Directus {
 
   /**
    * set the current locale
-   * @param locale locale
+   * @param locale default locale
    */
   setLocale(locale : string) {
     this.locale = locale;
   }
 
   /**
-   * set if translations should be merged for all items
-   * @param mergeAllTranslations true to merge all
+   * build a query for receiving multi language data from directus,
+   * based on given query.
+   * @param locale language in which the content is requested
+   * @param query existing query that needs to be modified
+   * @returns modified query ensuring data for translations is included
    */
-  setMergeAllTranslations(mergeAllTranslations : boolean) {
-    this.mergeAllTranslations = mergeAllTranslations;
-  }
+  buildMultiLanguageQuery = <T>(query? : QueryOne<T>) : QueryOne<T> => {
+    const q : QueryOne<T> = query || {
+      filter: undefined,
+      fields: undefined,
+      deep: undefined,
+    };
+    q.fields = q.fields || '*';
+    // handle querying the translation
+    if (this.locale !== this.defaultLocale) {
+      // ensure translation is being included
+      if (typeof q.fields === 'string' && q.fields !== '*.*' && q.fields !== '*.*.*') {
+        q.fields = `${q.fields},${this.parentTranslationsFieldName}.*`;
+      } else if (Array.isArray(q.fields)) {
+        q.fields.push(`${this.parentTranslationsFieldName}.*` as keyof T & string);
+      }
+      // deep filter to include correct language
+      q.deep = q.deep || {};
+      q.deep[this.parentTranslationsFieldName] = {
+        filter: {
+          [this.translationLanguageFieldName]: {
+            _eq: this.locale,
+          },
+        } as unknown as Filter<T>,
+      };
+    }
+    return q;
+  };
 
   /**
-   * overwrite the items data with data from the translation
+   * overwrite the given item's data with data from the translation
    * @param items directus item
    * @returns translated item
    */
-  mergeTranslations(items : { [key: string]: any }) : { [key: string]: any } {
-    const it = items;
+  mergeTranslation = <T>(item : T) : T => {
     if (this.locale === this.defaultLocale) {
-      return it;
+      return item;
     }
+    if (typeof item !== 'object' || item === null || Array.isArray(item) || item instanceof Function) {
+      logger.warn('unable to merge translation as given parameter is not an object');
+      return item;
+    }
+    const it = item as { [key: string]: any };
     let translations = it[this.parentTranslationsFieldName];
     if (!translations) {
       logger.warn(`unable to merge translations as given object does not have a property named ${this.parentTranslationsFieldName}`);
-      return it;
+      return it as T;
     }
     if (!Array.isArray(translations)) {
       logger.warn(`unable to merge translations, expected ${this.parentTranslationsFieldName} to be of type Array`);
-      return it;
+      return it as T;
     }
     if (translations.length === 0) {
       logger.warn(`unable to merge translations, ${this.parentTranslationsFieldName} is empty`);
-      return it;
+      return it as T;
     }
     translations = translations.filter(
       (translation) => translation[this.translationLanguageFieldName] === this.locale,
@@ -113,77 +162,24 @@ class Directus {
       }
     });
     delete (it[this.translationLanguageFieldName]);
-    return it;
-  }
+    return it as T;
+  };
 
   /**
-   * get directus items
-   * @param collection directus collection
-   * @param query query parameters
-   * @returns directus item(s)
+   * overwrite the item(s) data with data from the translation
+   * @param items directus item(s)
+   * @returns translated item(s)
    */
-  async getItems(collection : string,
-    query? : DirectusGlobalQuery)
-    : Promise<{ [key: string]: any } | [{ [key: string]: any }]> {
-    const l = this.locale || this.defaultLocale;
-    const q : DirectusGlobalQuery = query || {
-      filter: undefined,
-      fields: undefined,
-      deep: undefined,
-    };
-    q.fields = q.fields || ['*'];
-    if (q.deep && typeof q.deep !== 'string') {
-      q.deep = JSON.stringify(q.deep);
+  mergeTranslations = <T>(items : T) : T => {
+    if (this.locale === this.defaultLocale) {
+      return items;
     }
-    // handle querying the translation
-    if (l !== this.defaultLocale) {
-      q.fields.push(`${this.parentTranslationsFieldName}.*`); // ensure lanuage relation is being resolved
-      const languageFilter = `{ "${this.parentTranslationsFieldName}": { "_filter": { "${this.translationLanguageFieldName}": { "_eq": "${l}" }}}}`;
-      q.deep = q.deep ? `{ "_and": [ ${q.deep}, ${languageFilter} ] ` : languageFilter; // filter translations for given language
+    if (Array.isArray(items)) {
+      const result = items.map((it) => this.mergeTranslation(it));
+      return result as unknown as T;
     }
-    const params = new URLSearchParams();
-    if (q.fields) {
-      params.append('fields', q.fields.join(','));
-    }
-    if (q.filter) {
-      if (typeof q.filter !== 'string') {
-        q.filter = JSON.stringify(q.filter);
-      }
-      params.append('filter', q.filter);
-    }
-    if (q.deep) {
-      params.append('deep', q.deep);
-    }
-    // run query
-    let url = `${this.baseUrl}/items/${collection}`;
-    const p = params.toString();
-    if (p.length > 0) {
-      url += `?${p}`;
-    }
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-    if (!response.ok) {
-      throw Error(response.statusText);
-    }
-    const { data } = await response.json();
-
-    if (!this.mergeAllTranslations) {
-      return data;
-    }
-    // merge translations
-    if (!Array.isArray(data)) {
-      return this.mergeTranslations(data);
-    }
-    const res = [] as unknown as [{ [key: string]: any }];
-    data.forEach((d) => {
-      res.push(this.mergeTranslations(d));
-    });
-    return res;
-  }
+    return this.mergeTranslation(items);
+  };
 }
 
-export default new Directus();
+export default new MultiLanguageDirectus();

@@ -84,8 +84,14 @@ const sassToCss = (sassFile) => new Promise((resolve, reject) => {
   );
 });
 
+/**
+ * async wrapper for writting file
+ * @param {string} outFile
+ * @param {string} data
+ * @returns
+ */
 const writeFile = (outFile, data) => {
-  console.log(`Creating file ${outFile}...`);
+  console.log(`creating file ${outFile}`);
   return new Promise((resolve, reject) => {
     fs.writeFile(outFile, data, { encoding: 'utf-8' }, (err) => {
       if (err) {
@@ -97,6 +103,9 @@ const writeFile = (outFile, data) => {
   });
 };
 
+/**
+ * write lit css files
+ */
 const sassRender = async () => {
   const template = "import { css } from 'lit';\n\nexport default css`{0}`;\n";
   const opts = getArgs();
@@ -110,6 +119,7 @@ const sassRender = async () => {
   await Promise.all(promises);
 };
 
+// run
 sassRender().catch((err) => {
   console.error(err);
   process.exit(-1);
