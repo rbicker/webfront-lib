@@ -96,7 +96,7 @@ export default class ApplicationStore<StateType> implements Store<StateType> {
    * @param event name of the event
    * @param data data to publish
    */
-  publish(event : string, data = {}) : void {
+  publish(event : string, data : any = undefined) : void {
     const name = `${this.name}:${event}`;
     this.context.dispatchEvent(
       new CustomEvent(name, {
