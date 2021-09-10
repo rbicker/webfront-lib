@@ -14,6 +14,7 @@ type QueryOne<T> = {
   deep?: Record<string, QueryMany<T>>;
   export?: 'json' | 'csv' | 'xml';
   filter?: Filter<T>;
+  _filter?: Filter<T>; // for deep queries
 };
 type QueryMany<T> = QueryOne<T> & {
   sort?: Sort<T>;
@@ -108,7 +109,7 @@ class MultiLanguageDirectus {
       // deep filter to include correct language
       q.deep = q.deep || {};
       q.deep[this.parentTranslationsFieldName] = {
-        filter: {
+        _filter: {
           [this.translationLanguageFieldName]: {
             _eq: this.locale,
           },
@@ -155,12 +156,15 @@ class MultiLanguageDirectus {
 
     Object.entries(it).forEach((entry) => {
       const key = entry[0];
-      if (Object.keys(translation).includes(key)) {
-        it[key] = translation[key];
-      } else {
-        logger.warn(`no translation found for ${key}`);
+      if (key !== this.parentTranslationsFieldName) {
+        if (Object.keys(translation).includes(key)) {
+          it[key] = translation[key];
+        } else {
+          logger.warn(`no translation found for ${key}`);
+        }
       }
     });
+
     delete (it[this.translationLanguageFieldName]);
     return it as T;
   };
